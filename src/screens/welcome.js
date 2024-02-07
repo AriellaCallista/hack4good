@@ -1,14 +1,15 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Image } from 'react-native'
 import React from 'react'
 import { colors } from '../utils/colors'
 import Button from '../components/button'
 
-export default function Welcome() {
+export default function Welcome({navigation}) {
   return (
     <View style={styles.container}>
         <View style={styles.header}>
-            <Text>WELCOME TO HEARTLINE</Text>
-            <Text>Continue as</Text>
+            <Image source={require('../assets/icons/heart.png')} style={styles.logo} />
+            <Text style={styles.welcome}>WELCOME TO HEARTLINE</Text>
+            <Text style={styles.continue}>Continue as</Text>
         </View>
         <View style={styles.header2}>
             <Button color={colors.darkRed} 
@@ -44,6 +45,7 @@ const styles = StyleSheet.create({
         borderRadius: 15, // Adjust to match the border radius in your design
         padding: 20, // Adjust the padding as needed
         alignItems: 'center',
+        justifyContent: 'space-evenly',
         shadowColor: '#000', // Shadow color can be adjusted
         shadowOffset: {
           width: 0,
@@ -65,7 +67,22 @@ const styles = StyleSheet.create({
         width: "85%",
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        flexDirection: 'column',
-        
+        flexDirection: 'column',      
+    },
+    welcome: {
+        fontFamily: 'Archivo',
+        fontSize: 50,
+        textAlign: 'center',
+        color: "white",
+        marginTop: -80,
+    },
+    continue: {
+        fontFamily: "Archivo",
+        color: "white",
+        fontSize: 25
+    },
+    logo: {
+        width: 300,
+        height: 300
     }
 })

@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, Text, View, Image } from 'react-native'
 import React from 'react'
 
-const Button = ({color, text, textColor, height = 'auto', borderRadius, onPress, disabled, width, icon}) => {
+const Fillup = ({color, text, textColor, height = 'auto', borderRadius, onPress, disabled, width, icon}) => {
   return (
     <TouchableOpacity disabled={disabled} onPress={onPress}>
       <View style={styles.container(color, height, borderRadius, width)}>
@@ -13,7 +13,7 @@ const Button = ({color, text, textColor, height = 'auto', borderRadius, onPress,
   )
 }
 
-export default Button
+export default Fillup
 
 const styles = StyleSheet.create({
     container: (color, height, borderRadius, width) => ({
@@ -27,10 +27,9 @@ const styles = StyleSheet.create({
     text: (textColor) => ({
         fontSize: 24,
         color: textColor,
-        fontFamily: 'Lilita',
+        fontFamily: 'Rubik',
         textAlignVertical: 'center',
-        alignItems: 'center'
-        // paddingLeft: 10
+        paddingLeft: 10
     }),
     icon: {
         height: 30,
