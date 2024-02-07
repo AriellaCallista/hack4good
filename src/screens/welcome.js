@@ -4,6 +4,17 @@ import { colors } from '../utils/colors'
 import Button from '../components/button'
 
 export default function Welcome({navigation}) {
+
+    const handleVolunteer = async () => {
+        
+        navigation.navigate('Login')
+    }
+
+    const handleAdministrator = async () => {
+        navigation.navigate('Login')
+    }
+
+
   return (
     <View style={styles.container}>
         <View style={styles.header}>
@@ -18,7 +29,7 @@ export default function Welcome({navigation}) {
             width={300}
             text="Volunteer"
             icon={require('../assets/icons/volunteer.png')}
-            onPress={() => navigation.navigate('Login')} />
+            onPress={handleVolunteer} />
 
             <Button color={colors.darkRed} 
             textColor={"#FFFFFF"}
@@ -26,7 +37,7 @@ export default function Welcome({navigation}) {
             width={300}
             text="Administrator"
             icon={require('../assets/icons/working.png')}
-            onPress={() => navigation.navigate('Login')} />
+            onPress={handleAdministrator} />
         </View>
       
     </View>
