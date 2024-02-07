@@ -26,9 +26,6 @@ export async function login (navigation, email, password, role) {
     await signInWithEmailAndPassword(authentication, email, password)
       .then((userCredential) => {
         console.log('User logged in successfully:',  userCredential);
-        setDoc(doc(db, "users", authentication.currentUser.uid), {
-            role: role
-        }, { merge: true })
         navigation.navigate('Home')
       })
       .catch((error) => {
