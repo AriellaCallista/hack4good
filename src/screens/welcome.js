@@ -2,16 +2,17 @@ import { View, Text, StyleSheet, Image } from 'react-native'
 import React from 'react'
 import { colors } from '../utils/colors'
 import Button from '../components/button'
+import { setUserRole } from '../api/firestore'
 
 export default function Welcome({navigation}) {
 
     const handleVolunteer = async () => {
+        navigation.navigate('LoginVol')
         
-        navigation.navigate('Login')
     }
 
     const handleAdministrator = async () => {
-        navigation.navigate('Login')
+        navigation.navigate('LoginAdm')
     }
 
 

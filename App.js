@@ -2,8 +2,11 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import 'react-native-gesture-handler';
 import Welcome from './src/screens/welcome';
-import Login from './src/screens/login';
-import Signup from './src/screens/signup';
+import LoginVolunteer from './src/screens/login';
+import SignupVolunteer from './src/screens/signup';
+import LoginAdmin from './src/screens/loginCopy';
+import SignupAdmin from './src/screens/signupCopy';
+import Home from './src/screens/home';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -28,8 +31,11 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name='Welcome' component={Welcome} options={{ headerShown: false }}/> 
-          <Stack.Screen name='Login' component={Login} options={{ headerShown: false }}/> 
-          <Stack.Screen name='Signup' component={Signup} options={{ headerShown: false }}/> 
+          <Stack.Screen name='LoginVol' component={LoginVolunteer} options={{ headerShown: false }}/> 
+          <Stack.Screen name='SignupVol' component={SignupVolunteer} options={{ headerShown: false }}/> 
+          <Stack.Screen name='LoginAdm' component={LoginAdmin} options={{ headerShown: false }}/> 
+          <Stack.Screen name='SignupAdm' component={SignupAdmin} options={{ headerShown: false }}/> 
+          <Stack.Screen name='Home' component={Home} options={{ headerShown: false }}/> 
         </Stack.Navigator>
       </NavigationContainer>
     );

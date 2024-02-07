@@ -25,18 +25,9 @@ export const submitUserData = (navigation, name, gender, major, year, photoURL) 
     navigation.navigate('Login')
 }
 
-export const saveRole = (role) => {
+export const setUserRole = (role, navigation) => {
     setDoc(doc(db, "users", authentication.currentUser.uid), {
-      name: name,
-      gender: gender,
-      major: major,
-      year: year,
-      email: authentication.currentUser.email,
-      userID: authentication.currentUser.uid,
-      matched: null,
-      xp: 200,
-      photoURL: photoURL,
-      appState: appState
+      role: role
     }, {merge: true}).then(() => {
       // data saved successfully
       console.log('data submitted');

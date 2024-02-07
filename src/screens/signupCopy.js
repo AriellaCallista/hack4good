@@ -1,36 +1,52 @@
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity} from 'react-native'
 import React, {useState, useEffect} from 'react';
 import { colors } from '../utils/colors'
 import Button from '../components/button'
-import { login } from '../api/auth';
 import { FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { authentication } from '../../config';
+import { signup } from '../api/auth';
 
-export default function LoginVolunteer({navigation}) {
+export default function SignupAdmin({navigation}) {
 
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
 
-    const volunteerLogin = async () => {
-        console.log(email)
-        console.log(password)
-        login(navigation, email, password, "volunteer")   
+
+    const adminSignup = async () => {
+        signup(navigation, name, username, email, password, "admin")
     }
 
   return (
     <View style={styles.container}>
         <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
+            <TouchableOpacity onPress={() => navigation.navigate('LoginVol')}>
                 <MaterialIcons name="arrow-back-ios" size={30} color="white" style={{margin: 10}} />
             </TouchableOpacity>
-            <Text style={styles.title}>VOLUNTEER</Text>
+
+            <Text style={styles.title}>CREATE YOUR ACCOUNT</Text>
         </View>
-        <View style={styles.header2}>
 
             <View style={styles.input}>
-                <FontAwesome name="user-circle-o" size={24} color="white" style={{paddingLeft: 5}}/>
+                <TextInput 
+                    value={name} 
+                    style={styles.textInput} 
+                    placeholder='Full Name'
+                    onChangeText={text => setName(text)}
+                />
+            </View>
+
+            <View style={styles.input}>
+                <TextInput 
+                    value={username} 
+                    style={styles.textInput} 
+                    placeholder='Username'
+                    onChangeText={text => setUsername(text)}
+                />
+            </View>
+
+            <View style={styles.input}>
                 <TextInput 
                     value={email} 
                     style={styles.textInput} 
@@ -39,9 +55,7 @@ export default function LoginVolunteer({navigation}) {
                 />
             </View>
 
-
             <View style={styles.input}>
-                <AntDesign name="lock" size={24} color="white" />
                 <TextInput 
                     value={password} 
                     style={styles.textInput} 
@@ -54,34 +68,12 @@ export default function LoginVolunteer({navigation}) {
             <View style={{marginTop: 30}}>
 
             </View>
-            <Button color={colors.darkRed} 
+            <Button color={colors.darkPink} 
             textColor={"#FFFFFF"}
             borderRadius={30}
             width={300}
-            text="Login"
-            onPress={volunteerLogin} />
-
-            <View style={{
-                flexDirection: 'row', 
-                justifyContent: 'space-evenly',
-                width: '90%'}}>
-                <Text 
-                    style={{fontFamily: "Rubik", right: 15, marginTop: 23}}
-                    >Don't have an account?
-                </Text>
-
-                <Text 
-                    style={{fontFamily: "Rubik", color: '#3685cd', right: 15, marginTop: 23}}
-                    onPress={() => navigation.navigate('SignupVol')}
-                    >Sign up here
-                </Text>
-
-            </View>
-            
-
-
-        </View>
-      
+            text="Create Account"
+            onPress={adminSignup} />
     </View>
   )
 }
@@ -97,9 +89,8 @@ const styles = StyleSheet.create({
         backgroundColor: colors.darkPink, // Replace with the actual color of your card
         borderRadius: 15, // Adjust to match the border radius in your design
         padding: 20, // Adjust the padding as needed
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-end',
         shadowColor: '#000', // Shadow color can be adjusted
         shadowOffset: {
           width: 0,
@@ -111,7 +102,7 @@ const styles = StyleSheet.create({
         // shadowRadius: 3.84, // The blur radius of the shadow
         // elevation: 5, // This adds shadow on Android (shadow props are for iOS)
         // // You might want to add margin here if needed
-        marginBottom: 30
+        marginBottom: 30,
 
     },
     header2: {
@@ -126,15 +117,15 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: 'Archivo',
-        fontSize: 40,
-        textAlign: 'center',
+        fontSize: 35,
+        textAlign: 'left',
         color: "white",
         textShadowColor: 'rgba(0, 0, 0, 0.8)',
         textShadowOffset: { width: 0, height: 1},
         textShadowRadius: 0.5,
     },
     input: {
-        backgroundColor: colors.fillGrey,
+        backgroundColor: "white",
         padding: 10,
         borderRadius: 30,
         width: 300,
@@ -143,9 +134,11 @@ const styles = StyleSheet.create({
         margin: 12
     },
     textInput: {
-        fontFamily: "Rubik",
-        fontSize: 17,
+        fontFamily: "Archivo",
+        fontSize: 15,
         paddingHorizontal: 5,
+        opacity: 0.5,
+        width: "90%"
     }
     
 })
