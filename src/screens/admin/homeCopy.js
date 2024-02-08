@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Linking } from 'react-native'
 import React, { useState, useEffect, useCallback } from 'react'
 import { colors } from '../../utils/colors'
 import Button from '../../components/button'
 import { fetchChatrooms, setUserRole } from '../../api/firestore'
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot, collection } from "firebase/firestore";
 import { db, authentication } from '../../../config'
 import * as ImagePicker from 'expo-image-picker';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -23,8 +23,6 @@ export default function HomeAdmin({navigation}) {
   const [profileUrl, setProfileUrl] = useState(null)
 
   const [activeTab, setActiveTab] = useState('posts')
-
-  const [events, setEvents] = useState([]);
 
   const handleTabPress = (tabName) => {
     setActiveTab(tabName)
@@ -61,9 +59,10 @@ export default function HomeAdmin({navigation}) {
                 //console.log(Date.now())
             })    
      }, [])
-)
+  )
 
 
+  
 
   return (
     <View style={styles.container}>
@@ -117,7 +116,7 @@ export default function HomeAdmin({navigation}) {
 
         </View>
         
-        
+        {/* Add Event */}
         <View style={styles.header2}>
           {activeTab === 'posts' && <Posts />}
           {activeTab === 'chats' && <Chats events={events}/>}
@@ -150,7 +149,6 @@ const styles = StyleSheet.create({
         // shadowOpacity: 0.25, // The opacity of the shadow
         // shadowRadius: 3.84, // The blur radius of the shadow
         // elevation: 5, // This adds shadow on Android (shadow props are for iOS)
-        // // You might want to add margin here if needed
         marginBottom: 30
 
     },
@@ -200,7 +198,7 @@ const styles = StyleSheet.create({
 
     },
     posts: {
-      width: '90%',
+      width: '100%',
       backgroundColor: 'white',
       height: '75%'
 
@@ -222,7 +220,6 @@ const styles = StyleSheet.create({
     captionInput: {
       fontFamily: 'Rubik',
       marginHorizontal: 10,
-      // backgroundColor: colors.darkGrey,
       height: '45%',
       
     },
@@ -251,5 +248,43 @@ const styles = StyleSheet.create({
       fontSize: 17,
       marginLeft: 5
 
+    },
+    eventItem: {
+      backgroundColor: 'transparent',
+      padding: 5,
+      marginLeft: 10,
+      marginRight: 10, 
+      marginBottom: 10,
+      width: '1000vw'
+    },
+    postsImg: {
+      width: '100vw',
+      borderRadius: 20
+    },
+    postsTitle: {
+      fontFamily: "Lilita",
+      color: colors.magentaRed,
+      fontSize: 30,
+      marginTop: 5,
+      marginLeft: 7
+    },
+    postsCaption: {
+      fontFamily: 'Rubik',
+      marginLeft: 7,
+      marginTop: 5,
+      marginBottom: 10
+    },
+    postsDate: {
+      backgroundColor: 'transparent',
+      width: '100%',
+      textAlign: 'center',
+      textAlignVertical: 'center',
+      height: 35,
+      fontFamily: 'Lilita',
+      fontSize: 20,
+      color: colors.darkPink
+    },
+    dateButtonContainer: {
+      flexDirection: 'row'
     }
 })

@@ -12,8 +12,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 
-
-
 export default function App() {
 
   const Stack = createStackNavigator();
