@@ -37,3 +37,17 @@ export const setUserRole = (role, navigation) => {
     });
     navigation.navigate('Login')
 }
+
+
+export const fetchEvents = () => new Promise(async (resolve) => {
+  const q = query(collection(db, "events"));
+  const documentSnapshot = await getDocs(q);
+  const events = [];
+  documentSnapshot.forEach((doc) => {
+    const data = doc.data();
+    const id = doc.id;
+    let item = {id, ...data};
+    users.push(item);
+  })
+  resolve(events);
+})

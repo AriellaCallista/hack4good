@@ -1,31 +1,29 @@
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native'
 import React, {useState, useEffect} from 'react';
-import { colors } from '../utils/colors'
-import Button from '../components/button'
-import { login } from '../api/auth';
+import { colors } from '../../utils/colors'
+import Button from '../../components/button'
 import { FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { authentication } from '../../config';
+import { login } from '../../api/auth';
 
-export default function LoginVolunteer({navigation}) {
+export default function LoginAdmin({navigation}) {
 
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const volunteerLogin = async () => {
+    const adminLogin = async () => {
         console.log(email)
         console.log(password)
-        login(navigation, email, password, "volunteer")   
+        login(navigation, email, password, "HomeAdm")   
     }
 
   return (
     <View style={styles.container}>
         <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
-                <MaterialIcons name="arrow-back-ios" size={30} color="white" style={{margin: 10}} />
+                <MaterialIcons name="arrow-back-ios" size={25} color="white" style={{margin: 5}} />
             </TouchableOpacity>
-            <Text style={styles.title}>VOLUNTEER</Text>
+            <Text style={styles.title}>ADMINISTRATOR</Text>
         </View>
         <View style={styles.header2}>
 
@@ -59,7 +57,7 @@ export default function LoginVolunteer({navigation}) {
             borderRadius={30}
             width={300}
             text="Login"
-            onPress={volunteerLogin} />
+            onPress={adminLogin} />
 
             <View style={{
                 flexDirection: 'row', 
@@ -72,7 +70,7 @@ export default function LoginVolunteer({navigation}) {
 
                 <Text 
                     style={{fontFamily: "Rubik", color: '#3685cd', right: 15, marginTop: 23}}
-                    onPress={() => navigation.navigate('SignupVol')}
+                    onPress={() => navigation.navigate('SignupAdm')}
                     >Sign up here
                 </Text>
 
@@ -99,7 +97,6 @@ const styles = StyleSheet.create({
         padding: 20, // Adjust the padding as needed
         alignItems: 'flex-end',
         justifyContent: 'center',
-        flexDirection: 'row',
         shadowColor: '#000', // Shadow color can be adjusted
         shadowOffset: {
           width: 0,
@@ -107,6 +104,7 @@ const styles = StyleSheet.create({
         },
         height: '23%',
         width: '100%',
+        flexDirection: 'row',
         // shadowOpacity: 0.25, // The opacity of the shadow
         // shadowRadius: 3.84, // The blur radius of the shadow
         // elevation: 5, // This adds shadow on Android (shadow props are for iOS)
@@ -126,7 +124,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: 'Archivo',
-        fontSize: 40,
+        fontSize: 35,
         textAlign: 'center',
         color: "white",
         textShadowColor: 'rgba(0, 0, 0, 0.8)',

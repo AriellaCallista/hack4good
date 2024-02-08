@@ -3,7 +3,7 @@ import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWith
 import { Alert } from 'react-native';
 import { collection, getDocs, setDoc, query, doc } from 'firebase/firestore';
 
-export const signup = async ( navigation, name, username, email, password, role ) => {
+export const signup = async ( navigation, name, username, email, password, role, next ) => {
   await createUserWithEmailAndPassword(authentication, email, password)
       .then((userCredential) => {
         console.log('Account created!');
@@ -12,7 +12,7 @@ export const signup = async ( navigation, name, username, email, password, role 
           username: username,
           role: role
         }, {merge : true});
-        navigation.navigate('Home');
+        navigation.navigate(next);
       })
       .catch((error) => {
         console.log('Error', error);
@@ -21,12 +21,12 @@ export const signup = async ( navigation, name, username, email, password, role 
 };
 
 
-export async function login (navigation, email, password, role) {
+export async function login (navigation, email, password, next) {
     console.log('login called');
     await signInWithEmailAndPassword(authentication, email, password)
       .then((userCredential) => {
         console.log('User logged in successfully:',  userCredential);
-        navigation.navigate('Home')
+        navigation.navigate(next)
       })
       .catch((error) => {
         console.log('Error at login ', error);
