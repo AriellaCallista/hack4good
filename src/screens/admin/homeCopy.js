@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput } from 'reac
 import React, { useState, useEffect, useCallback } from 'react'
 import { colors } from '../../utils/colors'
 import Button from '../../components/button'
-import { setUserRole } from '../../api/firestore'
+import { fetchChatrooms, setUserRole } from '../../api/firestore'
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { doc, getDoc } from "firebase/firestore";
@@ -10,16 +10,28 @@ import { db, authentication } from '../../../config'
 import * as ImagePicker from 'expo-image-picker';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import Posts from './posts'
+import Chats from './chats'
+
 
 import { useFocusEffect } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 export default function HomeAdmin({navigation}) {
-
+  const Tab = createBottomTabNavigator();
   const [name, setName] = useState(null)
   const [profileUrl, setProfileUrl] = useState(null)
 
-  const [newEvent, setNewEvent] = useState(null)
-  const [newEventDesc, setNewEventDesc] = useState(null)
+  const [activeTab, setActiveTab] = useState('posts')
+
+  const [events, setEvents] = useState([]);
+
+  const handleTabPress = (tabName) => {
+    setActiveTab(tabName)
+    fetchChatrooms()
+  }
+
+
 
   const chooseImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -69,83 +81,47 @@ export default function HomeAdmin({navigation}) {
             <Text style={{fontFamily: "Lilita", color: "white", fontSize: 30}}>Welcome Admin,</Text>
             <Text style={{fontFamily: "Rubik", color: "white", fontSize: 23, marginTop: 3, marginBottom: 3}}>{name}</Text>
           </View>
-
          
         </View>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '95%', marginTop: -18}}>
-          <TouchableOpacity>
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>Post</Text>
-            </View>
+
+        <Tab.Navigator>
+          <Tab.Screen name="Posts" component={Posts} />
+          <Tab.Screen name="Chat" component={Chats} />
+        </Tab.Navigator>
+    
+        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '95%', marginTop: -23}}>
+          <TouchableOpacity onPress={() => handleTabPress('posts')}>
+            { activeTab === 'posts'
+            ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
+                <Text style={styles.buttonText}>Posts</Text>
+              </View>
+            : <View style={[styles.button, {backgroundColor: colors.lightGrey}]}>
+                <Text style={styles.buttonText}>Posts</Text>
+              </View>
+            
+            }
+            
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>Chat</Text>
-            </View>
+          <TouchableOpacity onPress={() => handleTabPress('chats')}>
+          { activeTab === 'chats'
+            ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
+                <Text style={styles.buttonText}>Chats</Text>
+              </View>
+            : <View style={[styles.button, {backgroundColor: colors.lightGrey}]}>
+                <Text style={styles.buttonText}>Chats</Text>
+              </View>
+            
+            }
           </TouchableOpacity>
 
         </View>
         
         
         <View style={styles.header2}>
-          <View style={styles.header3}>
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <TextInput 
-                        value={newEvent} 
-                        style={styles.textInput} 
-                        placeholder='Add a new event...'
-                        onChangeText={text => setNewEvent(text)}
-                    />
-
-              <Ionicons name="send" size={24} color={colors.magentaRed} style={{marginTop: 10, marginRight: 15}} />
-
-
-            </View>
-           
-            <TextInput 
-                      value={newEventDesc} 
-                      style={styles.captionInput} 
-                      placeholder="What's it about?"
-                      onChangeText={text => setNewEventDesc(text)}
-                  />
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-around',}}>
-              <TouchableOpacity>
-                <View style={styles.button2}>
-                  <FontAwesome5 name="plus" size={15} color="white" />
-                  <Text style={styles.button2Text}>Images</Text>
-
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity>
-                <View style={styles.button2}>
-                  <FontAwesome5 name="plus" size={15} color="white" />
-                  <Text style={styles.button2Text}>App Form</Text>
-
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity>
-                <View style={styles.button2}>
-                  <FontAwesome5 name="plus" size={15} color="white" />
-                  <Text style={styles.button2Text}>Date</Text>
-
-                </View>
-              </TouchableOpacity>
-
-            </View>
-
-            </View>
-            
-           
-           <View style={styles.posts}>
-            <Text style={styles.subtitle}>Event History</Text>
-           </View>
+          {activeTab === 'posts' && <Posts />}
+          {activeTab === 'chats' && <Chats events={events}/>}
         </View>
-      
     </View>
   )
 }
@@ -185,10 +161,10 @@ const styles = StyleSheet.create({
         width: "95%",
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        flexDirection: 'column',      
+        flexDirection: 'column', 
+        marginTop: -6     
     },
     button: {
-      backgroundColor: colors.lightGrey,
       height: 'auto',
       borderColor: colors.magentaRed,
       borderWidth: 3,
@@ -196,14 +172,14 @@ const styles = StyleSheet.create({
       borderRadius: 12,
       justifyContent: 'center',
       alignItems: 'center',
-      width: 185,
+      width: 165,
       marginBottom: 12,
       
     },
     buttonText: {
       fontFamily: "Lilita",
       color: colors.magentaRed,
-      fontSize: 23
+      fontSize: 18
     },
     profileBG: {
       backgroundColor: colors.lightPink,

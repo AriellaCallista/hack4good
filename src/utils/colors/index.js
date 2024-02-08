@@ -6,7 +6,7 @@ const mainColors = {
     white: "#FFFFFF",
     grey1: "#AF9999",
     grey2: "#F8EFEF",
-    grey3: "E1D2D2",
+    grey3: "#E1D2D2",
     grey4: "#E6E1E1",
     red2: "#9b2c2c",
 }
@@ -20,6 +20,7 @@ export const colors = {
     mediumPink: mainColors.pink2,
     fillGrey: mainColors.grey4,
     magentaRed: mainColors.red2,
+    activeGrey: mainColors.grey3,
 
     button: {
         darkRed: {
