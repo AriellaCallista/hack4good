@@ -3,38 +3,46 @@ import React, {useState, useEffect} from 'react';
 import { colors } from '../utils/colors'
 import Button from '../components/button'
 import { FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { signup } from '../api/auth';
 
-export default function Signup({navigation}) {
+export default function SignupVolunteer({navigation}) {
 
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
+
+
+    const volunteerSignup = async () => {
+        signup(navigation, name, username, email, password, "volunteer")
+    }
 
   return (
     <View style={styles.container}>
         <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity onPress={() => navigation.navigate('LoginVol')}>
                 <MaterialIcons name="arrow-back-ios" size={30} color="white" style={{margin: 10}} />
             </TouchableOpacity>
-            
+
             <Text style={styles.title}>CREATE YOUR ACCOUNT</Text>
         </View>
 
             <View style={styles.input}>
                 <TextInput 
-                    value={email} 
-                    style={styles.textInput} 
-                    placeholder='Email'
-                    onChangeText={text => setEmail(text)}
-                />
-            </View>
-
-            <View style={styles.input}>
-                <TextInput 
-                    value={email} 
+                    value={name} 
                     style={styles.textInput} 
                     placeholder='Full Name'
-                    onChangeText={text => setEmail(text)}
+                    onChangeText={text => setName(text)}
+                />
+            </View>
+
+            <View style={styles.input}>
+                <TextInput 
+                    value={username} 
+                    style={styles.textInput} 
+                    placeholder='Username'
+                    onChangeText={text => setUsername(text)}
                 />
             </View>
 
@@ -43,15 +51,6 @@ export default function Signup({navigation}) {
                     value={email} 
                     style={styles.textInput} 
                     placeholder='Email'
-                    onChangeText={text => setEmail(text)}
-                />
-            </View>
-
-            <View style={styles.input}>
-                <TextInput 
-                    value={email} 
-                    style={styles.textInput} 
-                    placeholder='Username'
                     onChangeText={text => setEmail(text)}
                 />
             </View>
@@ -66,17 +65,6 @@ export default function Signup({navigation}) {
                 />
             </View>
 
-            <View style={styles.input}>
-
-                <TextInput 
-                    value={password} 
-                    style={styles.textInput} 
-                    placeholder='Repeat Password'
-                    secureTextEntry={true}
-                    onChangeText={text => setPassword(text)}
-                />
-            </View>
-
             <View style={{marginTop: 30}}>
 
             </View>
@@ -85,7 +73,7 @@ export default function Signup({navigation}) {
             borderRadius={30}
             width={300}
             text="Create Account"
-            onPress={() => navigation.navigate('Home')} />
+            onPress={volunteerSignup} />
     </View>
   )
 }
