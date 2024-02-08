@@ -39,14 +39,6 @@ export default function Welcome({navigation}) {
             text="Administrator"
             icon={require('../assets/icons/working.png')}
             onPress={handleAdministrator} />
-
-            <Button color={colors.darkRed} 
-            textColor={"#FFFFFF"}
-            borderRadius={30}
-            width={300}
-            text="Test"
-            icon={require('../assets/icons/working.png')}
-            onPress={() => navigation.navigate('CreateEvent')} />
         </View>
       
     </View>

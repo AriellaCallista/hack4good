@@ -11,8 +11,6 @@ import HomeVolunteer from './src/screens/volunteer/home';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import CreateEvent from './src/screens/createEvent';
-
 
 export default function App() {
 
@@ -38,7 +36,6 @@ export default function App() {
           <Stack.Screen name='SignupAdm' component={SignupAdmin} options={{ headerShown: false }}/> 
           <Stack.Screen name='HomeVol' component={HomeVolunteer} options={{ headerShown: false }}/> 
           <Stack.Screen name='HomeAdm' component={HomeAdmin} options={{ headerShown: false }}/> 
-          <Stack.Screen name='CreateEvent' component={CreateEvent} options={{ headerShown: false }}/> 
         </Stack.Navigator>
       </NavigationContainer>
     );
