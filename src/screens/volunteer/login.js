@@ -1,18 +1,30 @@
-import { View, Text, StyleSheet, Image, TextInput } from 'react-native'
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native'
 import React, {useState, useEffect} from 'react';
-import { colors } from '../utils/colors'
-import Button from '../components/button'
-import { FontAwesome, AntDesign } from '@expo/vector-icons';
+import { colors } from '../../utils/colors'
+import Button from '../../components/button'
+import { login } from '../../api/auth';
+import { FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { authentication } from '../../../config';
 
-export default function Login({navigation}) {
+export default function LoginVolunteer({navigation}) {
 
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const volunteerLogin = async () => {
+        console.log(email)
+        console.log(password)
+        login(navigation, email, password, "HomeVol")   
+    }
+
   return (
     <View style={styles.container}>
         <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
+                <MaterialIcons name="arrow-back-ios" size={30} color="white" style={{margin: 10}} />
+            </TouchableOpacity>
             <Text style={styles.title}>VOLUNTEER</Text>
         </View>
         <View style={styles.header2}>
@@ -47,7 +59,7 @@ export default function Login({navigation}) {
             borderRadius={30}
             width={300}
             text="Login"
-            onPress={() => navigation.navigate('Login')} />
+            onPress={volunteerLogin} />
 
             <View style={{
                 flexDirection: 'row', 
@@ -60,7 +72,7 @@ export default function Login({navigation}) {
 
                 <Text 
                     style={{fontFamily: "Rubik", color: '#3685cd', right: 15, marginTop: 23}}
-                    onPress={() => navigation.navigate('Signup')}
+                    onPress={() => navigation.navigate('SignupVol')}
                     >Sign up here
                 </Text>
 
@@ -85,8 +97,9 @@ const styles = StyleSheet.create({
         backgroundColor: colors.darkPink, // Replace with the actual color of your card
         borderRadius: 15, // Adjust to match the border radius in your design
         padding: 20, // Adjust the padding as needed
-        alignItems: 'center',
+        alignItems: 'flex-end',
         justifyContent: 'center',
+        flexDirection: 'row',
         shadowColor: '#000', // Shadow color can be adjusted
         shadowOffset: {
           width: 0,
@@ -113,7 +126,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: 'Archivo',
-        fontSize: 45,
+        fontSize: 40,
         textAlign: 'center',
         color: "white",
         textShadowColor: 'rgba(0, 0, 0, 0.8)',

@@ -2,8 +2,20 @@ import { View, Text, StyleSheet, Image } from 'react-native'
 import React from 'react'
 import { colors } from '../utils/colors'
 import Button from '../components/button'
+import { setUserRole } from '../api/firestore'
 
 export default function Welcome({navigation}) {
+
+    const handleVolunteer = async () => {
+        navigation.navigate('LoginVol')
+        
+    }
+
+    const handleAdministrator = async () => {
+        navigation.navigate('LoginAdm')
+    }
+
+
   return (
     <View style={styles.container}>
         <View style={styles.header}>
@@ -18,7 +30,7 @@ export default function Welcome({navigation}) {
             width={300}
             text="Volunteer"
             icon={require('../assets/icons/volunteer.png')}
-            onPress={() => navigation.navigate('Login')} />
+            onPress={handleVolunteer} />
 
             <Button color={colors.darkRed} 
             textColor={"#FFFFFF"}
@@ -26,7 +38,7 @@ export default function Welcome({navigation}) {
             width={300}
             text="Administrator"
             icon={require('../assets/icons/working.png')}
-            onPress={() => navigation.navigate('Login')} />
+            onPress={handleAdministrator} />
 
             <Button color={colors.darkRed} 
             textColor={"#FFFFFF"}

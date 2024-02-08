@@ -1,35 +1,34 @@
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity} from 'react-native'
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native'
 import React, {useState, useEffect} from 'react';
-import { colors } from '../utils/colors'
-import Button from '../components/button'
+import { colors } from '../../utils/colors'
+import Button from '../../components/button'
 import { FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { login } from '../../api/auth';
 
-export default function Signup({navigation}) {
+export default function LoginAdmin({navigation}) {
 
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const adminLogin = async () => {
+        console.log(email)
+        console.log(password)
+        login(navigation, email, password, "HomeAdm")   
+    }
+
   return (
     <View style={styles.container}>
         <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <MaterialIcons name="arrow-back-ios" size={30} color="white" style={{margin: 10}} />
+            <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
+                <MaterialIcons name="arrow-back-ios" size={25} color="white" style={{margin: 5}} />
             </TouchableOpacity>
-            
-            <Text style={styles.title}>CREATE YOUR ACCOUNT</Text>
+            <Text style={styles.title}>ADMINISTRATOR</Text>
         </View>
+        <View style={styles.header2}>
 
             <View style={styles.input}>
-                <TextInput 
-                    value={email} 
-                    style={styles.textInput} 
-                    placeholder='Full Name'
-                    onChangeText={text => setEmail(text)}
-                />
-            </View>
-
-            <View style={styles.input}>
+                <FontAwesome name="user-circle-o" size={24} color="white" style={{paddingLeft: 5}}/>
                 <TextInput 
                     value={email} 
                     style={styles.textInput} 
@@ -38,16 +37,9 @@ export default function Signup({navigation}) {
                 />
             </View>
 
-            <View style={styles.input}>
-                <TextInput 
-                    value={email} 
-                    style={styles.textInput} 
-                    placeholder='Username'
-                    onChangeText={text => setEmail(text)}
-                />
-            </View>
 
             <View style={styles.input}>
+                <AntDesign name="lock" size={24} color="white" />
                 <TextInput 
                     value={password} 
                     style={styles.textInput} 
@@ -57,26 +49,37 @@ export default function Signup({navigation}) {
                 />
             </View>
 
-            <View style={styles.input}>
-
-                <TextInput 
-                    value={password} 
-                    style={styles.textInput} 
-                    placeholder='Repeat Password'
-                    secureTextEntry={true}
-                    onChangeText={text => setPassword(text)}
-                />
-            </View>
-
             <View style={{marginTop: 30}}>
 
             </View>
-            <Button color={colors.darkPink} 
+            <Button color={colors.darkRed} 
             textColor={"#FFFFFF"}
             borderRadius={30}
             width={300}
-            text="Create Account"
-            onPress={() => navigation.navigate('Home')} />
+            text="Login"
+            onPress={adminLogin} />
+
+            <View style={{
+                flexDirection: 'row', 
+                justifyContent: 'space-evenly',
+                width: '90%'}}>
+                <Text 
+                    style={{fontFamily: "Rubik", right: 15, marginTop: 23}}
+                    >Don't have an account?
+                </Text>
+
+                <Text 
+                    style={{fontFamily: "Rubik", color: '#3685cd', right: 15, marginTop: 23}}
+                    onPress={() => navigation.navigate('SignupAdm')}
+                    >Sign up here
+                </Text>
+
+            </View>
+            
+
+
+        </View>
+      
     </View>
   )
 }
@@ -92,8 +95,8 @@ const styles = StyleSheet.create({
         backgroundColor: colors.darkPink, // Replace with the actual color of your card
         borderRadius: 15, // Adjust to match the border radius in your design
         padding: 20, // Adjust the padding as needed
-        alignItems: 'flex-start',
-        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
         shadowColor: '#000', // Shadow color can be adjusted
         shadowOffset: {
           width: 0,
@@ -101,11 +104,12 @@ const styles = StyleSheet.create({
         },
         height: '23%',
         width: '100%',
+        flexDirection: 'row',
         // shadowOpacity: 0.25, // The opacity of the shadow
         // shadowRadius: 3.84, // The blur radius of the shadow
         // elevation: 5, // This adds shadow on Android (shadow props are for iOS)
         // // You might want to add margin here if needed
-        marginBottom: 30,
+        marginBottom: 30
 
     },
     header2: {
@@ -121,14 +125,14 @@ const styles = StyleSheet.create({
     title: {
         fontFamily: 'Archivo',
         fontSize: 35,
-        textAlign: 'left',
+        textAlign: 'center',
         color: "white",
         textShadowColor: 'rgba(0, 0, 0, 0.8)',
         textShadowOffset: { width: 0, height: 1},
         textShadowRadius: 0.5,
     },
     input: {
-        backgroundColor: "white",
+        backgroundColor: colors.fillGrey,
         padding: 10,
         borderRadius: 30,
         width: 300,
@@ -137,11 +141,9 @@ const styles = StyleSheet.create({
         margin: 12
     },
     textInput: {
-        fontFamily: "Archivo",
-        fontSize: 15,
+        fontFamily: "Rubik",
+        fontSize: 17,
         paddingHorizontal: 5,
-        opacity: 0.5,
-        width: "90%"
     }
     
 })
