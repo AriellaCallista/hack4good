@@ -24,15 +24,6 @@ export default function Signup({navigation}) {
                 <TextInput 
                     value={email} 
                     style={styles.textInput} 
-                    placeholder='Email'
-                    onChangeText={text => setEmail(text)}
-                />
-            </View>
-
-            <View style={styles.input}>
-                <TextInput 
-                    value={email} 
-                    style={styles.textInput} 
                     placeholder='Full Name'
                     onChangeText={text => setEmail(text)}
                 />

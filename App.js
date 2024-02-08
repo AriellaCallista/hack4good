@@ -7,7 +7,7 @@ import Signup from './src/screens/signup';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-
+import CreateEvent from './src/screens/createEvent';
 
 
 export default function App() {
@@ -30,6 +30,7 @@ export default function App() {
           <Stack.Screen name='Welcome' component={Welcome} options={{ headerShown: false }}/> 
           <Stack.Screen name='Login' component={Login} options={{ headerShown: false }}/> 
           <Stack.Screen name='Signup' component={Signup} options={{ headerShown: false }}/> 
+          <Stack.Screen name='CreateEvent' component={CreateEvent} options={{ headerShown: false }}/> 
         </Stack.Navigator>
       </NavigationContainer>
     );
