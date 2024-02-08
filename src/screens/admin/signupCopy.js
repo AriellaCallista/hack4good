@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity} from 'react-native'
 import React, {useState, useEffect} from 'react';
-import { colors } from '../utils/colors'
-import Button from '../components/button'
+import { colors } from '../../utils/colors'
+import Button from '../../components/button'
 import { FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { signup } from '../api/auth';
+import { signup } from '../../api/auth';
 
-export default function SignupVolunteer({navigation}) {
+export default function SignupAdmin({navigation}) {
 
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState('');
@@ -14,8 +14,8 @@ export default function SignupVolunteer({navigation}) {
     const [username, setUsername] = useState('');
 
 
-    const volunteerSignup = async () => {
-        signup(navigation, name, username, email, password, "volunteer")
+    const adminSignup = async () => {
+        signup(navigation, name, username, email, password, "admin", "HomeAdm")
     }
 
   return (
@@ -73,7 +73,7 @@ export default function SignupVolunteer({navigation}) {
             borderRadius={30}
             width={300}
             text="Create Account"
-            onPress={volunteerSignup} />
+            onPress={adminSignup} />
     </View>
   )
 }
