@@ -1,70 +1,209 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Linking } from 'react-native'
 import React, { useState, useEffect, useCallback } from 'react'
 import { colors } from '../../utils/colors'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { ScrollView } from 'react-native-gesture-handler'
+import { doc, getDoc, setDoc, onSnapshot, collection } from "firebase/firestore";
+import { db, authentication } from '../../../config'
+import * as ImagePicker from 'expo-image-picker';
 
 export default function Posts() {
-    const [newEvent, setNewEvent] = useState(null)
-    const [newEventDesc, setNewEventDesc] = useState(null)
+     // For firestore document
+  const [newEvent, setNewEvent] = useState(null)
+  const [newEventDesc, setNewEventDesc] = useState(null)
+  const [eventDate, setEventDate] = useState("")
+  const [appFormLink, setAppFormLink] = useState("")
+
+  // For date picker
+  const [date, setDate] = useState(new Date())
+  const [showPicker, setShowPicker] = useState(false)
+
+  const chooseImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1
+    })
+
+    // console.log(result);
+    console.log(result.assets[0].uri);
+
+    if (!result.canceled) {
+      // save photo to storage and generate downloadURL to be saved in firestore
+     saveUserProfileImage(result.assets[0].uri)
+      .then((date) => setLastPhotoUpdatedAt(date))
+    }
+  }
+
+
+  const toggleDatePicker = () => {
+    setShowPicker(!showPicker)
+  }
+
+  const onDatePickerChange = ({ type }, selectedDate) => {
+    if (type == "set") {
+      const currentDate = selectedDate
+      setDate(currentDate)
+      setEventDate(currentDate.toDateString())
+      toggleDatePicker()
+    } else {
+      toggleDatePicker()
+    }
+  }
+
+  // Submit new event
+  const createEntry = async () => {
+    try {
+        // Error alerts
+        if (!newEvent || !newEventDesc || !eventDate || !appFormLink) {
+            alert('Please fill in all required fields!');
+            return;
+        }
+
+        // Check if app form link is valid
+        const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+        if (!urlRegex.test(appFormLink)) {
+          alert("Please add a valid link.");
+          return;
+        }
+
+        // Add document to Firestore
+        await setDoc(doc(db, "events", newEvent),{
+            newEvent,
+            newEventDesc,
+            eventDate,
+            appFormLink
+        });
+
+        // Clear fields
+        setNewEvent('');
+        setNewEventDesc('');
+        setEventDate('');
+        setAppFormLink('');
+
+    } catch (error) {
+        // Handle the error here
+        console.error("Error creating event:", error);
+        alert("Error creating event. Please try again.");
+    }
+  }
+
+  // For events history
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'events'), (snapshot) => {
+      const eventsData = [];
+      snapshot.forEach((doc) => {
+        eventsData.push({ id: doc.id, ...doc.data() });
+      });
+      setEvents(eventsData);
+    });
+  
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const handleButtonPress = async (url) => {
+    // Checking if the link is supported for links with custom URL schemes.
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      // Opening the link with the default browser on the device.
+      await Linking.openURL(url);
+    } else {
+      console.error("Don't know how to open this URL:", url);
+    }
+  };
 
   return (
     <View>
         <View style={styles.header3}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              
+              {/* Event title */}
+              <TextInput 
+                        value={newEvent} 
+                        style={styles.textInput} 
+                        placeholder='Add a new event...'
+                        onChangeText={text => setNewEvent(text)}
+                    />
+              
+              {/* Send button */}
+              <TouchableOpacity onPress={createEntry}>
+                <Ionicons name="send" size={24} color={colors.magentaRed} style={{ marginTop: 10, marginRight: 15 }} />
+              </TouchableOpacity>
+            </View>
 
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <TextInput 
-                    value={newEvent} 
-                    style={styles.textInput} 
-                    placeholder='Add a new event...'
-                    onChangeText={text => setNewEvent(text)}
-                />
-
-        <Ionicons name="send" size={24} color={colors.magentaRed} style={{marginTop: 10, marginRight: 15}} />
-
-
-        </View>
-
-        <TextInput 
-                value={newEventDesc} 
-                style={styles.captionInput} 
-                placeholder="What's it about?"
-                onChangeText={text => setNewEventDesc(text)}
+            {/* Event description */}
+            <TextInput 
+                      value={newEventDesc} 
+                      style={styles.captionInput} 
+                      placeholder="What's it about?"
+                      onChangeText={text => setNewEventDesc(text)}
             />
 
-        <View style={{flexDirection: 'row', justifyContent: 'space-around',}}>
-        <TouchableOpacity>
-            <View style={styles.button2}>
-            <FontAwesome5 name="plus" size={15} color="white" />
-            <Text style={styles.button2Text}>Images</Text>
+            <View style={{flexDirection: 'row', justifyContent: 'space-around',}}>
+              {/* Image button */}
+              <TouchableOpacity onPress={chooseImage}>
+                <View style={styles.button2}>
+                  <FontAwesome5 name="plus" size={15} color="white" />
+                  <Text style={styles.button2Text}>Image</Text>
 
+                </View>
+              </TouchableOpacity>
+
+              {/* App form button */}
+              <TouchableOpacity onPress={() => setAppFormLink("")}>
+                <View style={styles.button2}>
+                 {appFormLink
+                  ? <FontAwesome5 name="minus" size={15} color="white" />
+                  : <FontAwesome5 name="plus" size={15} color="white"/>
+                 }
+                  <TextInput style={styles.button2Text} placeholder='App Form' placeholderTextColor='white'
+                  value={appFormLink} onChangeText={setAppFormLink}/>
+                </View>
+              </TouchableOpacity>
+
+              {/* Date button */}
+              <TouchableOpacity onPress={toggleDatePicker}>
+                <View style={styles.button2}>
+                  {!eventDate && (<FontAwesome5 name="plus" size={15} color="white" />)}
+                  <TextInput style={styles.button2Text} placeholder='Date' placeholderTextColor='white'
+                  editable={false} value={eventDate} onChangeText={setEventDate}/>
+                </View>
+
+                {showPicker && (
+                  <DateTimePicker mode='date' display='spinner' value={date} 
+                  onChange={onDatePickerChange}/>
+                )}
+              </TouchableOpacity>
             </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity>
-            <View style={styles.button2}>
-            <FontAwesome5 name="plus" size={15} color="white" />
-            <Text style={styles.button2Text}>App Form</Text>
-
-            </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity>
-            <View style={styles.button2}>
-            <FontAwesome5 name="plus" size={15} color="white" />
-            <Text style={styles.button2Text}>Date</Text>
-
-            </View>
-        </TouchableOpacity>
-
-        </View>
-
-        </View>
-
-
-        <View style={styles.posts}>
-        <Text style={styles.subtitle}>Event History</Text>
-        </View>
+          </View>
+          
+          {/* Event History */}
+          <View style={styles.posts}>
+            <Text style={styles.subtitle}>Event History</Text>
+            <ScrollView style={styles.posts}>
+              {events.map((event) => (
+                <View key={event.id} style={styles.eventItem}>
+                  <Image source={require('../../assets/placeholder-img.png')} style={styles.postsImg}/>
+                  <Text style={styles.postsTitle}>{event.newEvent}</Text>
+                  <Text style={styles.postsCaption}>{event.newEventDesc}</Text>
+                  <View style={styles.dateButtonContainer}>
+                    <TouchableOpacity style={styles.button2} onPress={() => handleButtonPress(event.appFormLink)}>
+                        <Text style={styles.button2Text}>Apply Now</Text>
+                      </TouchableOpacity>
+                    <Text style={styles.postsDate}>{event.eventDate}</Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
     </View>
   )
 }
@@ -94,7 +233,6 @@ const styles = StyleSheet.create({
         // shadowOpacity: 0.25, // The opacity of the shadow
         // shadowRadius: 3.84, // The blur radius of the shadow
         // elevation: 5, // This adds shadow on Android (shadow props are for iOS)
-        // // You might want to add margin here if needed
         marginBottom: 30
 
     },
@@ -138,15 +276,16 @@ const styles = StyleSheet.create({
     },
     header3: {
       backgroundColor: colors.lightPink,
-      width: '90%',
-      height: '20%',
-      borderRadius: 15,
+      width: '120%',
+      height: '23%',
+      borderRadius: 10,
+      marginLeft: 22
 
     },
     posts: {
-        // marginTop: 10,
-        // backgroundColor: 'white',
-        height: '75%'
+      //width: '100%',
+      //backgroundColor: 'white',
+      height: '75%'
 
     },
     subtitle: {
@@ -166,7 +305,6 @@ const styles = StyleSheet.create({
     captionInput: {
       fontFamily: 'Rubik',
       marginHorizontal: 10,
-      // backgroundColor: colors.darkGrey,
       height: '45%',
       
     },
@@ -195,5 +333,43 @@ const styles = StyleSheet.create({
       fontSize: 17,
       marginLeft: 5
 
+    },
+    eventItem: {
+      backgroundColor: 'transparent',
+      padding: 5,
+      marginLeft: 10,
+      marginRight: 10, 
+      marginBottom: 10,
+      width: '1000'
+    },
+    postsImg: {
+      width: '100',
+      borderRadius: 20
+    },
+    postsTitle: {
+      fontFamily: "Lilita",
+      color: colors.magentaRed,
+      fontSize: 30,
+      marginTop: 5,
+      marginLeft: 7
+    },
+    postsCaption: {
+      fontFamily: 'Rubik',
+      marginLeft: 7,
+      marginTop: 5,
+      marginBottom: 10
+    },
+    postsDate: {
+      backgroundColor: 'transparent',
+      width: '100%',
+      textAlign: 'center',
+      textAlignVertical: 'center',
+      height: 35,
+      fontFamily: 'Lilita',
+      fontSize: 20,
+      color: colors.darkPink
+    },
+    dateButtonContainer: {
+      flexDirection: 'row'
     }
 })

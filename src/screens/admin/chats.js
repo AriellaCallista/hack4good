@@ -5,7 +5,7 @@ import { ListItem } from '../../components/listItem';
 import { colors } from '../../utils/colors';
 
 
-export default function Chats() {
+export default function Chats({navigation}) {
 
     const [events, setEvents] = useState([]);
 
@@ -23,9 +23,8 @@ export default function Chats() {
         key={event => event.date + event.newEvent}
         renderItem={({item}) => 
             <ListItem 
-            onPress={() => navigation.navigate('Chatroom', {})}
+            onPress={() => navigation.navigate('AdminChat', {})}
             title={item.newEvent}
-            image={item.photoURL}
             />
         }
       />
@@ -37,11 +36,13 @@ export default function Chats() {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'red',
-        // width: '100%',
+        flex: 1,
+        //backgroundColor: 'red',
+        width: '100%',
+        height: '100%'
         // height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 20
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        // marginTop: 20
     }
 })

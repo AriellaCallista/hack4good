@@ -12,12 +12,10 @@ export function ListItem({title, subTitle, image, ImageComponent, onPress}) {
             <View style={styles.container}>
                 {ImageComponent}
                {image && <Image source={{uri:image}} style={styles.image}/>} 
-                <View style={styles.ownerHolder}>
                     <Text style={styles.name}>{title}</Text>
                    {/* {subTitle && <AppText inputText={subTitle} stylesLing={styles.listing} noOfLines={2}/>} */}
-                    
-                </View>
-                <MaterialCommunityIcons name='chevron-right' size={20} color='#000'/>
+        
+                <MaterialCommunityIcons name='chevron-right' size={20} color='#000' style={{marginRight: 20}}/>
             </View>
         </TouchableOpacity>
   )
@@ -28,11 +26,16 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         backgroundColor: colors.darkPink,
         alignItems:"center",
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         borderColor: 'black',
-        borderWidth: 0.8,
+        flexDirection: 'row',
+        borderWidth: 0.6,
         borderRadius: 8,
-        width: "100%"
+        width: "95%",
+        marginLeft: 10,
+        marginVertical: 8,
+        height: 60,
+        marginHorizontal: 4
     },
     image:{
         width:80,
@@ -43,7 +46,9 @@ const styles = StyleSheet.create({
     },
     name:{
         fontFamily: 'Lilita',
-        color: 'white'
+        color: 'white',
+        fontSize: 20,
+        marginLeft: 10
     },
     listing:{
         color:"#6e6969",

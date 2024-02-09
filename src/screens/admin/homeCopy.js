@@ -88,7 +88,7 @@ export default function HomeAdmin({navigation}) {
           <Tab.Screen name="Chat" component={Chats} />
         </Tab.Navigator>
     
-        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '95%', marginTop: -23}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', marginTop: -20}}>
           <TouchableOpacity onPress={() => handleTabPress('posts')}>
             { activeTab === 'posts'
             ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
@@ -119,7 +119,7 @@ export default function HomeAdmin({navigation}) {
         {/* Add Event */}
         <View style={styles.header2}>
           {activeTab === 'posts' && <Posts />}
-          {activeTab === 'chats' && <Chats events={events}/>}
+          {activeTab === 'chats' && <Chats navigation={navigation}/>}
         </View>
     </View>
   )
@@ -146,9 +146,9 @@ const styles = StyleSheet.create({
         height: '18%',
         width: '100%',
         flexDirection: 'row',
-        // shadowOpacity: 0.25, // The opacity of the shadow
-        // shadowRadius: 3.84, // The blur radius of the shadow
-        // elevation: 5, // This adds shadow on Android (shadow props are for iOS)
+        shadowOpacity: 0.25, // The opacity of the shadow
+        shadowRadius: 3.84, // The blur radius of the shadow
+        elevation: 5, // This adds shadow on Android (shadow props are for iOS)
         marginBottom: 30
 
     },
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         alignItems: 'center',
         flexDirection: 'column', 
-        marginTop: -6     
+        marginTop: -2,
     },
     button: {
       height: 'auto',
@@ -222,9 +222,6 @@ const styles = StyleSheet.create({
       marginHorizontal: 10,
       height: '45%',
       
-    },
-    caption: {
-
     },
     button2: {
       backgroundColor: colors.darkPink,
