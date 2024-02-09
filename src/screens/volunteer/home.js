@@ -34,7 +34,7 @@ export default function HomeVolunteer({navigation}) {
   return (
     <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
             <View style={styles.profileBG}>
               <FontAwesome6 name="user-large" size={55} color="white" />
             </View>
