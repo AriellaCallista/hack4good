@@ -1,91 +1,89 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Linking } from 'react-native'
-import React, { useState, useEffect, useCallback }  from 'react'
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Linking, Alert } from 'react-native'
+import React, { useState, useEffect, useCallback } from 'react'
 import { colors } from '../../utils/colors'
-import Button from '../../components/button'
-import { setUserRole } from '../../api/firestore'
-import { FontAwesome6 } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { doc, getDoc, setDoc, onSnapshot, collection } from "firebase/firestore";
-import { db, authentication } from '../../../config'
+import { FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { ScrollView } from 'react-native-gesture-handler'
-import { useFocusEffect } from '@react-navigation/native';
-import Opportunites from './opportunities'
-import Chats from './chats'
-import Profile from './profile'
+import { doc, getDoc, setDoc, onSnapshot, collection, getDocs } from "firebase/firestore";
+import { db, authentication } from '../../../config'
+import * as ImagePicker from 'expo-image-picker';
+import { saveVolunteerData } from '../../api/firestore';
 
-export default function HomeVolunteer({navigation}) {
-  const [name, setName] = useState(null)
-  const [profileUrl, setProfileUrl] = useState(null)
-  const [activeTab, setActiveTab] = useState('opportunities')
+export default function Opportunites() {
 
-  const handleTabPress = (tabName) => {
-    setActiveTab(tabName)
-  }
+  const [events, setEvents] = useState([]);
+  const [currentUser, setCurrentUser] = useState({
+    name: '',
+    age: '',
+    gender: '',
+    workStatus: '',
+    interests: [],
+    skills: [],
+    username: ''
+  })
 
-  useFocusEffect(
-    useCallback(() => {
-        getDoc(doc(db, "users", authentication.currentUser.uid))
-            .then((doc) => {
-                setName(doc.get('name'))
-                setProfileUrl(doc.get('profileUrl'))
-            })    
-     }, [])
-  )  
+
+  useEffect(() => {
+    const unsubscribeEvents = onSnapshot(collection(db, 'events'), (snapshot) => {
+      const eventsData = [];
+      snapshot.forEach((doc) => {
+        eventsData.push({ id: doc.id, ...doc.data() });
+      });
+      setEvents(eventsData);
+    });
+  
+    const unsubscribeUser = onSnapshot(doc(db, 'users', authentication.currentUser.uid), (doc) => {
+      if (doc.exists()) {
+        setCurrentUser({ id: doc.id, ...doc.data() }); // Assuming setCurrentUser is your state setter for the user data
+      } else {
+        // Handle the case where the user document does not exist
+        console.log("No such document!");
+      }
+    });
+  
+    // Cleanup function
+    return () => {
+      unsubscribeEvents();
+      unsubscribeUser();
+    };
+  }, []); // Dependency array is empty, meaning this effect runs once on mount.
+
+
+  const handleJoin = async (eventName) => {
+    if (currentUser.gender === undefined || currentUser.age === undefined || currentUser.workStatus === undefined || currentUser.interests === undefined || currentUser.skills === undefined) {
+        Alert.alert("Incomplete Profile", "Please make sure all your profile fields are filled out.");
+    } else {
+        saveVolunteerData(eventName, currentUser.name, currentUser.gender, currentUser.age, currentUser.workStatus, currentUser.interests, currentUser.skills, currentUser.username)
+        Alert.alert("You're In!", "Head over to your chats to dive into the group conversation and meet others attending.");
+    }
+  };
 
   return (
-    <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate(Profile)}>
-            <View style={styles.profileBG}>
-              <FontAwesome6 name="user-large" size={55} color="white" />
-            </View>
-          </TouchableOpacity>
-
-          <View style={{marginHorizontal: 40}}>
-            <Text style={{fontFamily: "Lilita", color: "white", fontSize: 30}}>Welcome User,</Text>
-            <Text style={{fontFamily: "Rubik", color: "white", fontSize: 23, marginTop: 3, marginBottom: 3}}>{name}</Text>
-          </View>
-
-          <View style={{marginRight: 20, marginBottom: 10}}>
-            <MaterialCommunityIcons name="qrcode-scan" size={60} color="white" />
-          </View>
+    <View style={styles.posts}>
+          <Text style={styles.subtitle}>Events</Text>
+          <ScrollView style={styles.posts}>
+            {events.map((event) => (
+              <View key={event.id} style={styles.eventItem}>
+                <Image source={require('../../assets/placeholder-img.png')} style={styles.postsImg}/>
+                <Text style={styles.postsTitle}>{event.newEvent}</Text>
+                <Text style={styles.postsCaption}>{event.newEventDesc}</Text>
+                <View style={styles.dateButtonContainer}>
+                    
+                    <TouchableOpacity style={styles.button2} onPress={() => handleJoin(event.newEvent)}>
+                        <Text style={styles.button2Text}>Join</Text>
+                    </TouchableOpacity>
+                   
+                  <Text style={styles.postsDate}>{event.eventDate}</Text>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
         </View>
-
-        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', marginTop: -20}}>
-          <TouchableOpacity onPress={() => handleTabPress('opportunities')}>
-            { activeTab === 'opportunities'
-            ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
-                <Text style={styles.buttonText}>Opportunities</Text>
-              </View>
-            : <View style={[styles.button, {backgroundColor: colors.lightGrey}]}>
-                <Text style={styles.buttonText}>Opportunities</Text>
-              </View>
-            
-            }
-            
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => handleTabPress('chats')}>
-          { activeTab === 'chats'
-            ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
-                <Text style={styles.buttonText}>Chats</Text>
-              </View>
-            : <View style={[styles.button, {backgroundColor: colors.lightGrey}]}>
-                <Text style={styles.buttonText}>Chats</Text>
-              </View>
-            
-            }
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.header2}>
-          {activeTab === 'opportunities' && <Opportunites/>}
-          {activeTab === 'chats' && <Chats navigation={navigation}/>}
-        </View>
-      
-    </View>
+    
   )
 }
+
 
 const styles = StyleSheet.create({
     container: {

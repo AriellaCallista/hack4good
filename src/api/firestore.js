@@ -65,3 +65,33 @@ export const fetchChatrooms =  () => new Promise(async(resolve) =>  {
   })
   resolve(chats);
 })
+
+export const getCurrentUserName =  () => new Promise(async(resolve) =>  {
+  const userRef = doc(db, 'users', authentication.currentUser.uid);
+  const userSnap = await getDoc(userRef);
+  
+  if (userSnap.exists()) {
+    console.log(userSnap.data().name)
+    resolve(userSnap.data().name); // Assuming the field for the user's name is 'name'
+  } else {
+    // Handle the case where the user doesn't exist in the database
+  } 
+})
+
+export const saveVolunteerData = (eventName, name, gender, age, workStatus, interests, skills, username) => {
+  setDoc(doc(db, "events", eventName, "volunteers", authentication.currentUser.uid), {
+    name: name,
+    gender: gender,
+    age: age,
+    workStatus: workStatus,
+    interests: interests, 
+    skills: skills,
+    username: username
+  }, {merge: true}).then(() => {
+    // data saved successfully
+    console.log('data submitted');
+  }).catch((error) => {
+    //the write failed
+    console.log(error)
+  });
+}

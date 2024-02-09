@@ -11,7 +11,6 @@ import { colors } from '../../utils/colors';
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
-import { EvilIcons } from '@expo/vector-icons';
 
 export default function AdminChat({route, navigation}) {
   const uid = route.params.uid
@@ -143,9 +142,9 @@ export default function AdminChat({route, navigation}) {
       
           <TouchableOpacity>
           <View style={styles.cert}>
-            <Text style={{fontFamily: 'Rubik', fontSize: 20 }}>Statistics</Text>
+            <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Download E-Certificate</Text>
             
-            <EvilIcons style={{marginBottom:10}} name="chart" size={35} color="black" />
+            <AntDesign name="download" size={24} color="black" />
           </View>
         </TouchableOpacity>
         
@@ -242,8 +241,8 @@ const styles = StyleSheet.create({
   cert: {
     backgroundColor: colors.activeGrey,
     flexDirection: 'row',
-    width: 150,
-    justifyContent: 'space-around',
+    width: 225,
+    justifyContent: 'space-evenly',
     height: 40,
     alignItems: 'center',
     borderRadius: 20,
