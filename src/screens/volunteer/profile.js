@@ -16,8 +16,8 @@ export default function Profile({navigation}) {
         username: "",
         gender: "",
         skills: "",
+        interests: "",
         workStatus: "",
-        interests: ""
     });
 
     useEffect(() => {
@@ -46,10 +46,37 @@ export default function Profile({navigation}) {
             <Text>Skills: {userProfile.skills}</Text>
             <Text>Work Status: {userProfile.workStatus}</Text>
             <Text>Interests: {userProfile.interests}</Text>
+            
+
+            <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('EditProfile')}>
+                <Text style={styles.button2Text}>Edit Profile</Text>
+            </TouchableOpacity>
         </ScrollView>
     )
 }
 
 const styles = StyleSheet.create({
-    
+    button2: {
+        backgroundColor: colors.darkPink,
+        borderColor: 'black',
+        borderWidth: 0.5,
+        borderRadius: 10,
+        width: 100,
+        height: 35,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 4,
+        flexDirection: 'row',
+        marginBottom: 20,
+        marginTop: -1,
+        marginHorizontal: 5
+  
+      },
+      button2Text: {
+        color: 'white',
+        fontFamily: 'Lilita',
+        fontSize: 17,
+        marginLeft: 5
+  
+      },
 })

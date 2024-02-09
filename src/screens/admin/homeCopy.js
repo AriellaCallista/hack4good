@@ -61,9 +61,6 @@ export default function HomeAdmin({navigation}) {
      }, [])
   )
 
-
-  
-
   return (
     <View style={styles.container}>
         <View style={styles.header}>
@@ -92,7 +89,7 @@ export default function HomeAdmin({navigation}) {
           <TouchableOpacity onPress={() => handleTabPress('posts')}>
             { activeTab === 'posts'
             ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
-                <Text style={styles.buttonText}>Posts</Text>
+                <Text style={styles.buttonText}>Posts.,,</Text>
               </View>
             : <View style={[styles.button, {backgroundColor: colors.lightGrey}]}>
                 <Text style={styles.buttonText}>Posts</Text>

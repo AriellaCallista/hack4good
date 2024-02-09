@@ -9,45 +9,26 @@ import { db, authentication } from '../../../config'
 import { doc, getDoc, onSnapshot, collection } from "firebase/firestore";
 import { ScrollView } from 'react-native-gesture-handler'
 import Profile from './profile'
-import ProfileSurvey from './profileSurvey'
 
 export default function HomeVolunteer({navigation}) {
-  const [userProfile, setUserProfile] = useState({
-    name: "",
-    username: "",
-    gender: "",
-    skills: "",
-    workStatus: "",
-    interests: ""
-});
+  const [name, setName] = useState('')
 
-useEffect(() => {
-    // Fetch user profile data
-    const fetchUserProfile = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
         const userDoc = await getDoc(doc(db, "users", authentication.currentUser.uid));
 
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          setUserProfile(userData);
+          setName(userData.name);
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
     };
 
-    fetchUserProfile();
+    fetchData();
   }, []); 
-
-  useEffect(() => {
-    // Check if any of the required fields is empty
-    const isProfileIncomplete = Object.values(userProfile).some(value => value === "");
-
-    // If the profile is incomplete, navigate to profileSurvey.js
-    if (isProfileIncomplete) {
-      navigation.navigate(ProfileSurvey);
-    }
-  }, [userProfile, navigation]);
   
   // For events history
   const [events, setEvents] = useState([]);
@@ -89,7 +70,7 @@ useEffect(() => {
 
           <View style={{marginHorizontal: 40}}>
             <Text style={{fontFamily: "Lilita", color: "white", fontSize: 30}}>Welcome User,</Text>
-            <Text style={{fontFamily: "Rubik", color: "white", fontSize: 23, marginTop: 3, marginBottom: 3}}>{userProfile.name}</Text>
+            <Text style={{fontFamily: "Rubik", color: "white", fontSize: 23, marginTop: 3, marginBottom: 3}}>{name}</Text>
           </View>
 
           <View style={{marginRight: 20, marginBottom: 10}}>
