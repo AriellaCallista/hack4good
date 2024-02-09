@@ -11,7 +11,6 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { useFocusEffect } from '@react-navigation/native';
 import Opportunites from './opportunities'
 import Chats from './chats'
-import Profile from './profile'
 
 export default function HomeVolunteer({navigation}) {
   const [name, setName] = useState(null)
@@ -35,7 +34,7 @@ export default function HomeVolunteer({navigation}) {
   return (
     <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate(Profile)}>
+          <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
             <View style={styles.profileBG}>
               <FontAwesome6 name="user-large" size={55} color="white" />
             </View>
