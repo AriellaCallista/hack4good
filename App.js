@@ -11,6 +11,7 @@ import HomeVolunteer from './src/screens/volunteer/home';
 import Profile from './src/screens/volunteer/profile';
 import EditProfile from './src/screens/volunteer/editProfile';
 import AdminChat from './src/screens/admin/adminChat';
+import EventStats from './src/screens/admin/eventStats';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -43,6 +44,7 @@ export default function App() {
           <Stack.Screen name='Profile' component={Profile} options={{ headerShown: false }} />
           <Stack.Screen name='EditProfile' component={EditProfile}  options={{ headerShown: false }} />
           <Stack.Screen name='AdminChat' component={AdminChat} options={{ headerShown: false }}/> 
+          <Stack.Screen name='EventStats' component={EventStats} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     );

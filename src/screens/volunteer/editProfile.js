@@ -36,8 +36,8 @@ export default function EditProfile({navigation}) {
         fetchUserData();
     }, []); 
 
-    const skillsData = ['Skill 1', 'Skill 2', 'Skill 3']; // Add more skills as needed
-    const interestsData = ['Interest 1', 'Interest 2', 'Interest 3']; // Add more interests as needed
+    const skillsData = ['On ground volunteering', 'Photography/videography', 'Language skills', 'Sports', 'Teaching', 'Driving']; 
+    const interestsData = ['Science', 'Sustainability', 'Human rights']; 
 
     const handleToggleSkill = (skill) => {
         const updatedSkills = [...skills];

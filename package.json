@@ -11,12 +11,11 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-native-community/datetimepicker": "7.6.1",
-    "@react-native-community/datetimepicker": "^7.6.1",
     "@react-native-firebase/app": "^18.8.0",
     "@react-native-firebase/auth": "^18.8.0",
     "@react-native-firebase/firestore": "^18.8.0",
-    "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-native-picker/picker": "^2.6.1",
+    "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-navigation/stack": "^6.3.20",
     "expo": "~50.0.6",
     "expo-image-picker": "~14.7.1",
@@ -25,8 +24,8 @@
     "react": "18.2.0",
     "react-native": "0.73.4",
     "react-native-gesture-handler": "~2.14.0",
-    "@react-native-community/datetimepicker": "7.6.1",
-    "react-native-gifted-chat": "^2.4.0"
+    "react-native-gifted-chat": "^2.4.0",
+    "react-native-pie-chart": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

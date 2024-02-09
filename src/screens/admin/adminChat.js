@@ -12,6 +12,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { EvilIcons } from '@expo/vector-icons';
+import EventStats from './eventStats';
 
 export default function AdminChat({route, navigation}) {
   const uid = route.params.uid
@@ -141,7 +142,8 @@ export default function AdminChat({route, navigation}) {
 
         </View>
       
-          <TouchableOpacity>
+        {/* Stats button */}
+        <TouchableOpacity onPress={() => navigation.navigate('EventStats', { eventId: chatName })}>
           <View style={styles.cert}>
             <Text style={{fontFamily: 'Rubik', fontSize: 20 }}>Statistics</Text>
             

@@ -1,10 +1,6 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Linking } from 'react-native'
+import { Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect }  from 'react'
 import { colors } from '../../utils/colors'
-import Button from '../../components/button'
-import { setUserRole } from '../../api/firestore'
-import { FontAwesome6 } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { db, authentication } from '../../../config'
 import { getDoc, doc } from "firebase/firestore";
 import { ScrollView } from 'react-native-gesture-handler'
