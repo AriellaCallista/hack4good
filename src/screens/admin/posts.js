@@ -10,7 +10,7 @@ import { db, authentication } from '../../../config'
 import * as ImagePicker from 'expo-image-picker';
 
 export default function Posts() {
-     // For firestore document
+  // For firestore document
   const [newEvent, setNewEvent] = useState(null)
   const [newEventDesc, setNewEventDesc] = useState(null)
   const [eventDate, setEventDate] = useState("")
