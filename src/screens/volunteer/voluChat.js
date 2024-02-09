@@ -11,8 +11,6 @@ import { colors } from '../../utils/colors';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import Chatroom from './chatroom';
-import Download from './download';
-import Attendance from './attendance';
 
 
 export default function VoluChat({route, navigation}) {
