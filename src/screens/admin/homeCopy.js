@@ -26,10 +26,7 @@ export default function HomeAdmin({navigation}) {
 
   const handleTabPress = (tabName) => {
     setActiveTab(tabName)
-    fetchChatrooms()
   }
-
-
 
   const chooseImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -116,7 +113,6 @@ export default function HomeAdmin({navigation}) {
 
         </View>
         
-        {/* Add Event */}
         <View style={styles.header2}>
           {activeTab === 'posts' && <Posts />}
           {activeTab === 'chats' && <Chats navigation={navigation}/>}
