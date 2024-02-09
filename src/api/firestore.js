@@ -51,3 +51,17 @@ export const fetchEvents = () => new Promise(async (resolve) => {
   })
   resolve(events);
 })
+
+
+export const fetchChatrooms =  () => new Promise(async(resolve) =>  {
+  const q = query(collection(db, 'events'));
+  let chats = [];
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const id = doc.id;
+    chats.push({...data});
+    console.log(chats);
+  })
+  resolve(chats);
+})
