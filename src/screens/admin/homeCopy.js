@@ -260,8 +260,8 @@ export default function HomeAdmin({navigation}) {
               ))}
             </ScrollView>
           </View>
+          
         </View>
-      
     </View>
   )
 }
