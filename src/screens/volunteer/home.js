@@ -5,12 +5,50 @@ import Button from '../../components/button'
 import { setUserRole } from '../../api/firestore'
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { db } from '../../../config'
-import { onSnapshot, collection } from "firebase/firestore";
+import { db, authentication } from '../../../config'
+import { doc, getDoc, onSnapshot, collection } from "firebase/firestore";
 import { ScrollView } from 'react-native-gesture-handler'
-
+import Profile from './profile'
+import ProfileSurvey from './profileSurvey'
 
 export default function HomeVolunteer({navigation}) {
+  const [userProfile, setUserProfile] = useState({
+    name: "",
+    username: "",
+    gender: "",
+    skills: "",
+    workStatus: "",
+    interests: ""
+});
+
+useEffect(() => {
+    // Fetch user profile data
+    const fetchUserProfile = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, "users", authentication.currentUser.uid));
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setUserProfile(userData);
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []); 
+
+  useEffect(() => {
+    // Check if any of the required fields is empty
+    const isProfileIncomplete = Object.values(userProfile).some(value => value === "");
+
+    // If the profile is incomplete, navigate to profileSurvey.js
+    if (isProfileIncomplete) {
+      navigation.navigate(ProfileSurvey);
+    }
+  }, [userProfile, navigation]);
+  
   // For events history
   const [events, setEvents] = useState([]);
 
@@ -43,7 +81,7 @@ export default function HomeVolunteer({navigation}) {
   return (
     <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate(Profile)}>
             <View style={styles.profileBG}>
               <FontAwesome6 name="user-large" size={55} color="white" />
             </View>
@@ -51,7 +89,7 @@ export default function HomeVolunteer({navigation}) {
 
           <View style={{marginHorizontal: 40}}>
             <Text style={{fontFamily: "Lilita", color: "white", fontSize: 30}}>Welcome User,</Text>
-            <Text style={{fontFamily: "Rubik", color: "white", fontSize: 23, marginTop: 3, marginBottom: 3}}>Ariella</Text>
+            <Text style={{fontFamily: "Rubik", color: "white", fontSize: 23, marginTop: 3, marginBottom: 3}}>{userProfile.name}</Text>
           </View>
 
           <View style={{marginRight: 20, marginBottom: 10}}>

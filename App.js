@@ -8,6 +8,8 @@ import LoginAdmin from './src/screens/admin/loginCopy';
 import SignupAdmin from './src/screens/admin/signupCopy';
 import HomeAdmin from './src/screens/admin/homeCopy';
 import HomeVolunteer from './src/screens/volunteer/home';
+import Profile from './src/screens/volunteer/profile';
+import ProfileSurvey from './src/screens/volunteer/profileSurvey';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -36,6 +38,8 @@ export default function App() {
           <Stack.Screen name='SignupAdm' component={SignupAdmin} options={{ headerShown: false }}/> 
           <Stack.Screen name='HomeVol' component={HomeVolunteer} options={{ headerShown: false }}/> 
           <Stack.Screen name='HomeAdm' component={HomeAdmin} options={{ headerShown: false }}/> 
+          <Stack.Screen name='Profile' component={Profile} options={{ headerShown: false }} />
+          <Stack.Screen name='ProfileSurvey' component={ProfileSurvey}  options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     );
