@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Linking } f
 import React, { useState, useEffect, useCallback } from 'react'
 import { colors } from '../../utils/colors'
 import Button from '../../components/button'
-import { setUserRole } from '../../api/firestore'
+import { fetchChatrooms, setUserRole } from '../../api/firestore'
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { doc, getDoc, setDoc, onSnapshot, collection } from "firebase/firestore";
@@ -10,40 +10,26 @@ import { db, authentication } from '../../../config'
 import * as ImagePicker from 'expo-image-picker';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import Posts from './posts'
+import Chats from './chats'
+
 
 import { useFocusEffect } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { ScrollView } from 'react-native-gesture-handler'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 export default function HomeAdmin({navigation}) {
-
+  const Tab = createBottomTabNavigator();
   const [name, setName] = useState(null)
   const [profileUrl, setProfileUrl] = useState(null)
 
-  // For firestore document
-  const [newEvent, setNewEvent] = useState(null)
-  const [newEventDesc, setNewEventDesc] = useState(null)
-  const [eventDate, setEventDate] = useState("")
-  const [appFormLink, setAppFormLink] = useState("")
+  const [activeTab, setActiveTab] = useState('posts')
 
-  // For date picker
-  const [date, setDate] = useState(new Date())
-  const [showPicker, setShowPicker] = useState(false)
-
-  const toggleDatePicker = () => {
-    setShowPicker(!showPicker)
+  const handleTabPress = (tabName) => {
+    setActiveTab(tabName)
+    fetchChatrooms()
   }
 
-  const onDatePickerChange = ({ type }, selectedDate) => {
-    if (type == "set") {
-      const currentDate = selectedDate
-      setDate(currentDate)
-      setEventDate(currentDate.toDateString())
-      toggleDatePicker()
-    } else {
-      toggleDatePicker()
-    }
-  }
+
 
   const chooseImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -75,71 +61,7 @@ export default function HomeAdmin({navigation}) {
      }, [])
   )
 
-  // Submit new event
-  const createEntry = async () => {
-    try {
-        // Error alerts
-        if (!newEvent || !newEventDesc || !eventDate || !appFormLink) {
-            alert('Please fill in all required fields!');
-            return;
-        }
 
-        // Check if app form link is valid
-        const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
-        if (!urlRegex.test(appFormLink)) {
-          alert("Please add a valid link.");
-          return;
-        }
-
-        // Add document to Firestore
-        await setDoc(doc(db, "events", newEvent),{
-            newEvent,
-            newEventDesc,
-            eventDate,
-            appFormLink
-        });
-
-        // Clear fields
-        setNewEvent('');
-        setNewEventDesc('');
-        setEventDate('');
-        setAppFormLink('');
-
-    } catch (error) {
-        // Handle the error here
-        console.error("Error creating event:", error);
-        alert("Error creating event. Please try again.");
-    }
-  }
-
-  // For events history
-  const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'events'), (snapshot) => {
-      const eventsData = [];
-      snapshot.forEach((doc) => {
-        eventsData.push({ id: doc.id, ...doc.data() });
-      });
-      setEvents(eventsData);
-    });
-  
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  const handleButtonPress = async (url) => {
-    // Checking if the link is supported for links with custom URL schemes.
-    const supported = await Linking.canOpenURL(url);
-
-    if (supported) {
-      // Opening the link with the default browser on the device.
-      await Linking.openURL(url);
-    } else {
-      console.error("Don't know how to open this URL:", url);
-    }
-  };
   
 
   return (
@@ -158,110 +80,47 @@ export default function HomeAdmin({navigation}) {
             <Text style={{fontFamily: "Lilita", color: "white", fontSize: 30}}>Welcome Admin,</Text>
             <Text style={{fontFamily: "Rubik", color: "white", fontSize: 23, marginTop: 3, marginBottom: 3}}>{name}</Text>
           </View>
-
          
         </View>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '95%', marginTop: -18}}>
-          <TouchableOpacity>
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>Post</Text>
-            </View>
+
+        <Tab.Navigator>
+          <Tab.Screen name="Posts" component={Posts} />
+          <Tab.Screen name="Chat" component={Chats} />
+        </Tab.Navigator>
+    
+        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', marginTop: -20}}>
+          <TouchableOpacity onPress={() => handleTabPress('posts')}>
+            { activeTab === 'posts'
+            ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
+                <Text style={styles.buttonText}>Posts</Text>
+              </View>
+            : <View style={[styles.button, {backgroundColor: colors.lightGrey}]}>
+                <Text style={styles.buttonText}>Posts</Text>
+              </View>
+            
+            }
+            
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>Chat</Text>
-            </View>
+          <TouchableOpacity onPress={() => handleTabPress('chats')}>
+          { activeTab === 'chats'
+            ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
+                <Text style={styles.buttonText}>Chats</Text>
+              </View>
+            : <View style={[styles.button, {backgroundColor: colors.lightGrey}]}>
+                <Text style={styles.buttonText}>Chats</Text>
+              </View>
+            
+            }
           </TouchableOpacity>
 
         </View>
         
         {/* Add Event */}
         <View style={styles.header2}>
-          <View style={styles.header3}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              
-              {/* Event title */}
-              <TextInput 
-                        value={newEvent} 
-                        style={styles.textInput} 
-                        placeholder='Add a new event...'
-                        onChangeText={text => setNewEvent(text)}
-                    />
-              
-              {/* Send button */}
-              <TouchableOpacity onPress={createEntry}>
-                <Ionicons name="send" size={24} color={colors.magentaRed} style={{ marginTop: 10, marginRight: 15 }} />
-              </TouchableOpacity>
-            </View>
-
-            {/* Event description */}
-            <TextInput 
-                      value={newEventDesc} 
-                      style={styles.captionInput} 
-                      placeholder="What's it about?"
-                      onChangeText={text => setNewEventDesc(text)}
-            />
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-around',}}>
-              {/* Image button */}
-              <TouchableOpacity onPress={chooseImage}>
-                <View style={styles.button2}>
-                  <FontAwesome5 name="plus" size={15} color="white" />
-                  <Text style={styles.button2Text}>Image</Text>
-
-                </View>
-              </TouchableOpacity>
-
-              {/* App form button */}
-              <TouchableOpacity onPress={() => setAppFormLink("")}>
-                <View style={styles.button2}>
-                 {appFormLink
-                  ? <FontAwesome5 name="minus" size={15} color="white" />
-                  : <FontAwesome5 name="plus" size={15} color="white"/>
-                 }
-                  <TextInput style={styles.button2Text} placeholder='App Form' placeholderTextColor='white'
-                  value={appFormLink} onChangeText={setAppFormLink}/>
-                </View>
-              </TouchableOpacity>
-
-              {/* Date button */}
-              <TouchableOpacity onPress={toggleDatePicker}>
-                <View style={styles.button2}>
-                  {!eventDate && (<FontAwesome5 name="plus" size={15} color="white" />)}
-                  <TextInput style={styles.button2Text} placeholder='Date' placeholderTextColor='white'
-                  editable={false} value={eventDate} onChangeText={setEventDate}/>
-                </View>
-
-                {showPicker && (
-                  <DateTimePicker mode='date' display='spinner' value={date} 
-                  onChange={onDatePickerChange}/>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-          
-          {/* Event History */}
-          <View style={styles.posts}>
-            <Text style={styles.subtitle}>Event History</Text>
-            <ScrollView style={styles.posts}>
-              {events.map((event) => (
-                <View key={event.id} style={styles.eventItem}>
-                  <Image source={require('../../assets/placeholder-img.png')} style={styles.postsImg}/>
-                  <Text style={styles.postsTitle}>{event.newEvent}</Text>
-                  <Text style={styles.postsCaption}>{event.newEventDesc}</Text>
-                  <View style={styles.dateButtonContainer}>
-                    <TouchableOpacity style={styles.button2} onPress={() => handleButtonPress(event.appFormLink)}>
-                        <Text style={styles.button2Text}>Apply Now</Text>
-                      </TouchableOpacity>
-                    <Text style={styles.postsDate}>{event.eventDate}</Text>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
+          {activeTab === 'posts' && <Posts />}
+          {activeTab === 'chats' && <Chats navigation={navigation}/>}
         </View>
-      
     </View>
   )
 }
@@ -287,9 +146,9 @@ const styles = StyleSheet.create({
         height: '18%',
         width: '100%',
         flexDirection: 'row',
-        // shadowOpacity: 0.25, // The opacity of the shadow
-        // shadowRadius: 3.84, // The blur radius of the shadow
-        // elevation: 5, // This adds shadow on Android (shadow props are for iOS)
+        shadowOpacity: 0.25, // The opacity of the shadow
+        shadowRadius: 3.84, // The blur radius of the shadow
+        elevation: 5, // This adds shadow on Android (shadow props are for iOS)
         marginBottom: 30
 
     },
@@ -300,10 +159,10 @@ const styles = StyleSheet.create({
         width: "95%",
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        flexDirection: 'column',      
+        flexDirection: 'column', 
+        marginTop: -2,
     },
     button: {
-      backgroundColor: colors.lightGrey,
       height: 'auto',
       borderColor: colors.magentaRed,
       borderWidth: 3,
@@ -311,14 +170,14 @@ const styles = StyleSheet.create({
       borderRadius: 12,
       justifyContent: 'center',
       alignItems: 'center',
-      width: 185,
+      width: 165,
       marginBottom: 12,
       
     },
     buttonText: {
       fontFamily: "Lilita",
       color: colors.magentaRed,
-      fontSize: 23
+      fontSize: 18
     },
     profileBG: {
       backgroundColor: colors.lightPink,
@@ -363,9 +222,6 @@ const styles = StyleSheet.create({
       marginHorizontal: 10,
       height: '45%',
       
-    },
-    caption: {
-
     },
     button2: {
       backgroundColor: colors.darkPink,
