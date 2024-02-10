@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity} from 'react-native'
+import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, Modal, TouchableWithoutFeedback, TextInput, Alert } from 'react-native'
 import React, { useState, useCallback, useEffect } from 'react'
 import { GiftedChat, Bubble, Send, Time, InputToolbar, Composer } from 'react-native-gifted-chat'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -12,6 +12,8 @@ import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { EvilIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import { saveAttCode } from '../../api/firestore';
 import EventStats from './eventStats';
 
 export default function AdminChat({route, navigation}) {
@@ -20,6 +22,42 @@ export default function AdminChat({route, navigation}) {
   const [messages, setMessages] = useState([]);
   const currentUser = authentication?.currentUser?.uid;
   const [name, setName] = useState(null)
+  const [modalVisible, setModalVisible] = useState(false);
+  const [attCode, setAttCode] = useState('');
+  const [attActive, setAttActive] = useState(false)
+
+  const handleAttendance = () => {
+    Alert.alert(
+      "Set Attendance Code", 
+      "Please create a 4 digit attendance code for volunteers to use for check-in. Share this code with your volunteers to allow them to mark their attendance."
+    , [
+      {
+        text: 'OK',
+        onPress: () => setModalVisible(true),
+        style: {
+          backgroundColor: colors.mediumPink
+        }
+      }
+    ]
+    );
+  };
+
+  const handleAttendance2 = () => {
+    Alert.alert(
+      "You've set up an attendance code",
+      `The attendance code is ${attCode}.`
+    )
+  }
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  const handleSubmit = () => {
+    saveAttCode(attCode, chatName)
+    handleCloseModal();
+  };
+
 
   useFocusEffect(
     useCallback(() => {
@@ -39,6 +77,25 @@ export default function AdminChat({route, navigation}) {
 
   //chat backend 
   useEffect(() => {
+
+    const fetchEventData = async () => {
+      const eventRef = doc(db, 'events', chatName);
+      try {
+        const eventSnap = await getDoc(eventRef);
+        if (eventSnap.exists()) {
+          const data = eventSnap.data();
+          if (data && "attCode" in data) {
+            setAttCode(data.attCode);
+            setAttActive(false);
+          }
+        } else {
+          // Handle the case where the event document does not exist
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error getting document:", error);
+      }
+    };
     
     const chatId = uid > currentUser ? `${uid + '-' + currentUser}` : `${currentUser + '-' + uid}`;
     const docref = doc(db, 'chatrooms', uid);
@@ -65,6 +122,7 @@ export default function AdminChat({route, navigation}) {
     })
     console.log(name)
 
+    fetchEventData()
       return () => {
         unsubcribe()
       }
@@ -133,6 +191,36 @@ export default function AdminChat({route, navigation}) {
 
   return (
     <View style={styles.container}>
+
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={handleCloseModal}
+        >
+            <TouchableWithoutFeedback onPress={handleCloseModal}>
+            <View style={styles.modalOverlay}>
+                <TouchableWithoutFeedback>
+                <View style={styles.modalView}>
+                    <TextInput
+                    placeholder="Type here..."
+                    style={styles.modalText}
+                    onChangeText={text => setAttCode(text)}
+                    value={attCode}
+                    />
+                    <TouchableOpacity onPress={handleSubmit}>
+                        <View style={styles.submit}>
+                            <Text style={{color: 'white', fontFamily: 'Rubik', fontSize: 18}}>Submit</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+                </TouchableWithoutFeedback>
+            </View>                
+            </TouchableWithoutFeedback>
+
+        </Modal>
+
+
       <View style={styles.header}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'space-between', width: '100%'}}>
           <TouchableOpacity onPress={() => navigation.navigate('HomeAdm')}>
@@ -142,14 +230,32 @@ export default function AdminChat({route, navigation}) {
 
         </View>
       
-        {/* Stats button */}
-        <TouchableOpacity onPress={() => navigation.navigate('EventStats', { eventId: chatName })}>
-          <View style={styles.cert}>
-            <Text style={{fontFamily: 'Rubik', fontSize: 20 }}>Statistics</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: "90%"}}>
+          {attActive
+          ?
+          <TouchableOpacity onPress={handleAttendance}>
+            <View style={styles.cert}>
+                <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Attendance</Text>
+                <AntDesign name="checksquareo" size={24} color="black" />
+            </View>
+            </TouchableOpacity>
+          :
+          <TouchableOpacity onPress={handleAttendance2}>
+            <View style={[styles.cert, {backgroundColor: colors.activeGrey}]}>
+                <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Attendance</Text>
+                <AntDesign name="checksquareo" size={24} color="black" />
+            </View>
+            </TouchableOpacity>
+          }
             
-            <EvilIcons style={{marginBottom:10}} name="chart" size={35} color="black" />
-          </View>
-        </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('EventStats', { eventId: chatName, navigation: navigation })}>
+            <View style={styles.cert}>
+                <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Statistics</Text>
+                <Feather name="bar-chart" size={24} color="black" />
+            </View>
+            </TouchableOpacity>
+        </View> 
         
       </View>
       <View style={styles.chat}>
@@ -306,6 +412,63 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginLeft: 0,
     marginRight: 0,
+  },
+  cert: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    width: 150,
+    justifyContent: 'space-evenly',
+    height: 40,
+    alignItems: 'center',
+    borderRadius: 10,
+    borderColor: 'black'
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: colors.activeGrey,
+    borderRadius: 20,
+    padding: 20,
+    width: 200,
+    height: 125,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: 'center',
+    
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    fontFamily: 'Rubik',
+    fontSize: 18,
+    color: 'black'
+  },
+  submit: {
+    backgroundColor: colors.mediumPink,
+    width: 80,
+    height: 30,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: -10
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim the background
   },
 })
 

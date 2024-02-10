@@ -21,6 +21,7 @@ export const colors = {
     fillGrey: mainColors.grey4,
     magentaRed: mainColors.red2,
     activeGrey: mainColors.grey3,
+    
 
     button: {
         darkRed: {

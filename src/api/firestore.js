@@ -53,7 +53,7 @@ export const fetchEvents = () => new Promise(async (resolve) => {
 })
 
 
-export const fetchChatrooms =  () => new Promise(async(resolve) =>  {
+export const fetchAdminChatrooms =  () => new Promise(async(resolve) =>  {
   const q = query(collection(db, 'events'));
   let chats = [];
   const querySnapshot = await getDocs(q);
@@ -78,11 +78,10 @@ export const getCurrentUserName =  () => new Promise(async(resolve) =>  {
   } 
 })
 
-export const saveVolunteerData = (eventName, name, gender, age, workStatus, interests, skills, username) => {
+export const saveVolunteerData = (eventName, name, gender, workStatus, interests, skills, username) => {
   setDoc(doc(db, "events", eventName, "volunteers", authentication.currentUser.uid), {
     name: name,
     gender: gender,
-    age: age,
     workStatus: workStatus,
     interests: interests, 
     skills: skills,
@@ -94,4 +93,32 @@ export const saveVolunteerData = (eventName, name, gender, age, workStatus, inte
     //the write failed
     console.log(error)
   });
+}
+
+export const saveEventData = (event) => {
+  setDoc(doc(db, "users", authentication.currentUser.uid, "events", event.newEvent), {
+    newEvent: event.newEvent,
+    newEventDesc: event.newEventDesc,
+    eventDate: event.eventDate,
+    appFormLink: event.appFormLink
+  }, {merge: true})
+}
+
+export const fetchUserChatrooms =  () => new Promise(async(resolve) =>  {
+  const q = query(collection(db, 'users', authentication.currentUser.uid, 'events'));
+  let chats = [];
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const id = doc.id;
+    chats.push({...data});
+    console.log(chats);
+  })
+  resolve(chats);
+})
+
+export const saveAttCode = (code, event) => {
+  setDoc(doc(db, "events", event), {
+    attCode: code
+  }, {merge: true})
 }

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import PieChart from 'react-native-pie-chart';
 import { doc, collection, getDocs } from 'firebase/firestore';
@@ -7,8 +7,9 @@ import { volunteerGender, genderColors, volunteerSkills, skillsColors,
   volunteerInterests, interestsColors, volunteerWorkStatus, workStatusColors } from '../volunteer/dataOptions';
 import { ScrollView } from 'react-native-gesture-handler';
 import { colors } from '../../utils/colors';
+import { MaterialIcons } from '@expo/vector-icons';
 
-export default function EventStats({ route }) {
+export default function EventStats({ route, navigation }) {
   const { eventId } = route.params
   const [genderCount, setGenderCount] = useState([]);
   const [skillsCount, setSkillsCount] = useState([]);
@@ -96,6 +97,12 @@ export default function EventStats({ route }) {
 
   return (
     <ScrollView style={styles.container}>
+      <View style={{marginTop: 50, marginLeft: 15, marginBottom: -30}}>
+        <TouchableOpacity onPress={() => navigation.navigate('AdminChat', {name: eventId, uid: eventId, navigation: navigation})}>
+              <MaterialIcons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+     
       <Text style={styles.caption}>Event Statistics</Text>
       <Text style={styles.eventTitle}>{eventId}</Text>
 

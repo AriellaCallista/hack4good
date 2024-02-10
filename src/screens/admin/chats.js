@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { fetchChatrooms } from '../../api/firestore'
+import { fetchAdminChatrooms } from '../../api/firestore'
 import { ListItem } from '../../components/listItem';
 import { colors } from '../../utils/colors';
 
@@ -10,7 +10,7 @@ export default function Chats({navigation}) {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        fetchChatrooms()
+        fetchAdminChatrooms()
           .then(setEvents)
       },[])
 

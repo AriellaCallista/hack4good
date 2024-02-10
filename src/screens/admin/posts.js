@@ -108,22 +108,10 @@ export default function Posts() {
     };
   }, []);
 
-  const handleButtonPress = async (url) => {
-    // Checking if the link is supported for links with custom URL schemes.
-    const supported = await Linking.canOpenURL(url);
-
-    if (supported) {
-      // Opening the link with the default browser on the device.
-      await Linking.openURL(url);
-    } else {
-      console.error("Don't know how to open this URL:", url);
-    }
-  };
-
   return (
     <View>
         <View style={styles.header3}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '80%'}}>
               
               {/* Event title */}
               <TextInput 
@@ -157,18 +145,6 @@ export default function Posts() {
                 </View>
               </TouchableOpacity>
 
-              {/* App form button */}
-              <TouchableOpacity onPress={() => setAppFormLink("")}>
-                <View style={styles.button2}>
-                 {appFormLink
-                  ? <FontAwesome5 name="minus" size={15} color="white" />
-                  : <FontAwesome5 name="plus" size={15} color="white"/>
-                 }
-                  <TextInput style={styles.button2Text} placeholder='App Form' placeholderTextColor='white'
-                  value={appFormLink} onChangeText={setAppFormLink}/>
-                </View>
-              </TouchableOpacity>
-
               {/* Date button */}
               <TouchableOpacity onPress={toggleDatePicker}>
                 <View style={styles.button2}>
@@ -195,9 +171,6 @@ export default function Posts() {
                   <Text style={styles.postsTitle}>{event.newEvent}</Text>
                   <Text style={styles.postsCaption}>{event.newEventDesc}</Text>
                   <View style={styles.dateButtonContainer}>
-                    <TouchableOpacity style={styles.button2} onPress={() => handleButtonPress(event.appFormLink)}>
-                        <Text style={styles.button2Text}>Apply Now</Text>
-                      </TouchableOpacity>
                     <Text style={styles.postsDate}>{event.eventDate}</Text>
                   </View>
                 </View>
@@ -279,7 +252,7 @@ const styles = StyleSheet.create({
       width: '120%',
       height: '23%',
       borderRadius: 10,
-      marginLeft: 22
+      marginLeft: 8
 
     },
     posts: {
@@ -367,9 +340,9 @@ const styles = StyleSheet.create({
       height: 35,
       fontFamily: 'Lilita',
       fontSize: 20,
-      color: colors.darkPink
+      color: colors.darkPink,
     },
     dateButtonContainer: {
-      flexDirection: 'row'
+      flexDirection: 'row',
     }
 })

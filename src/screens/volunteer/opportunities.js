@@ -8,20 +8,20 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { doc, getDoc, setDoc, onSnapshot, collection, getDocs } from "firebase/firestore";
 import { db, authentication } from '../../../config'
 import * as ImagePicker from 'expo-image-picker';
-import { saveVolunteerData } from '../../api/firestore';
+import { saveVolunteerData, saveEventData } from '../../api/firestore';
 
 export default function Opportunites() {
 
   const [events, setEvents] = useState([]);
   const [currentUser, setCurrentUser] = useState({
     name: '',
-    age: '',
     gender: '',
     workStatus: '',
     interests: [],
     skills: [],
     username: ''
   })
+
 
 
   useEffect(() => {
@@ -50,11 +50,12 @@ export default function Opportunites() {
   }, []); // Dependency array is empty, meaning this effect runs once on mount.
 
 
-  const handleJoin = async (eventName) => {
-    if (currentUser.gender === undefined || currentUser.age === undefined || currentUser.workStatus === undefined || currentUser.interests === undefined || currentUser.skills === undefined) {
+  const handleJoin = async (event) => {
+    if (currentUser.gender === undefined ||  currentUser.workStatus === undefined || currentUser.interests === undefined || currentUser.skills === undefined) {
         Alert.alert("Incomplete Profile", "Please make sure all your profile fields are filled out.");
     } else {
-        saveVolunteerData(eventName, currentUser.name, currentUser.gender, currentUser.age, currentUser.workStatus, currentUser.interests, currentUser.skills, currentUser.username)
+        saveVolunteerData(event.newEvent, currentUser.name, currentUser.gender, currentUser.workStatus, currentUser.interests, currentUser.skills, currentUser.username)
+        saveEventData(event)
         Alert.alert("You're In!", "Head over to your chats to dive into the group conversation and meet others attending.");
     }
   };
@@ -70,7 +71,7 @@ export default function Opportunites() {
                 <Text style={styles.postsCaption}>{event.newEventDesc}</Text>
                 <View style={styles.dateButtonContainer}>
                     
-                    <TouchableOpacity style={styles.button2} onPress={() => handleJoin(event.newEvent)}>
+                    <TouchableOpacity style={styles.button2} onPress={() => handleJoin(event)}>
                         <Text style={styles.button2Text}>Join</Text>
                     </TouchableOpacity>
                    

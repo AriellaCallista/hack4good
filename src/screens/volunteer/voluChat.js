@@ -1,198 +1,195 @@
-import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity} from 'react-native'
+import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, Modal, TextInput, TouchableWithoutFeedback, Alert } from 'react-native'
 import React, { useState, useCallback, useEffect } from 'react'
 import { GiftedChat, Bubble, Send, Time, InputToolbar, Composer } from 'react-native-gifted-chat'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { addDoc, collection, serverTimestamp , doc, onSnapshot, query, orderBy, getDoc} from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp , doc, onSnapshot, query, orderBy, getDoc, setDoc} from 'firebase/firestore';
 import { db, authentication } from '../../../config'
 import { getCurrentUserName } from '../../api/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../../utils/colors';
 import { AntDesign } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import Chatroom from './chatroom';
 
-export default function AdminChat({route, navigation}) {
-  const uid = route.params.uid
+
+export default function VoluChat({route, navigation}) {
   const chatName = route.params.name
-  const [messages, setMessages] = useState([]);
-  const currentUser = authentication?.currentUser?.uid;
-  const [name, setName] = useState(null)
+  const [modalVisible, setModalVisible] = useState(false);
+  const [attCode, setAttCode] = useState('');
+  const [userCode, setUserCode] = useState('');
+  const [attActive, setAttActive] = useState(false)
+  const [certActive, setCertActive] = useState(false)
+  const [currentUser, setCurrentUser] = useState({
+    name: '',
+    age: '',
+    gender: '',
+    workStatus: '',
+    interests: [],
+    skills: [],
+    username: ''
+  })
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchName = async () => {
-        try {
-          const userName = await getCurrentUserName();
-          setName(userName);
-        } catch (error) {
-          console.error('Failed to fetch user name:', error);
-        }
-      };
-  
-      fetchName();  
-     }, [])
-  )
+  const handleAttendance = () => {
+    setModalVisible(true);
+  };
 
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
 
-  //chat backend 
-  useEffect(() => {
-    
-    const chatId = uid > currentUser ? `${uid + '-' + currentUser}` : `${currentUser + '-' + uid}`;
-    const docref = doc(db, 'chatrooms', uid);
-    const colRef = collection(docref, 'messages');
-    const q = query(colRef, orderBy('createdAt',"desc"));
-    const unsubcribe = onSnapshot(q, (onSnap) => {
-      const allMsg = onSnap.docs.map(mes => {
-        if(mes.data().createdAt){
-          return{
-            ...mes.data(),
-            createdAt:mes.data().createdAt.toDate()
-          }
-        }else{
-          return{
-            ...mes.data(),
-            createdAt:new Date()
-          }
-        }
-        
-
-      })
-      setMessages(allMsg)
-
-    })
-    console.log(name)
-
-      return () => {
-        unsubcribe()
-      }
-
-  },[])
-
-  const onSend = useCallback((messagesArray) => {
-    const msg = messagesArray[0];
-    const myMsg = {
-      ...msg,
-      sentBy:name,
-      sentTo:uid
+  const handleSubmit = () => {
+    if (attCode === userCode) {
+        setDoc(doc(db, "events", chatName, "attendees", authentication.currentUser.uid), {
+            name: currentUser.name,
+            gender: currentUser.gender,
+            workStatus: currentUser.workStatus,
+            interests: currentUser.interests, 
+            skills: currentUser.skills,
+            username: currentUser.username
+          }, {merge: true}).then(() => {
+            // data saved successfully
+            console.log('data submitted');
+          }).catch((error) => {
+            //the write failed
+            console.log(error)
+          });
+        handleCloseModal();
+        setCertActive(true)
+        Alert.alert("Attendance taken! You can now download your E-Certificate")
+    } else {
+        handleCloseModal();
+        Alert.alert("Incorrect attendance code")
     }
-    setMessages(previousMessages => GiftedChat.append(previousMessages, myMsg))
+    
+  };
 
-    const docref = doc(db, 'chatrooms', uid);
-    const colRef = collection(docref, 'messages');
-    const chatSnap = addDoc(colRef, {
-      ...myMsg,
-      createdAt:serverTimestamp(),
-    })
-  }, [])
+  const handleDownload = () => {
 
-
-  const scrollToBottomComponent = () => {
-    return(
-      <FontAwesome name='angle-double-down' size={22} color='#333' />
-    );
   }
 
-  const renderSend = (props) => {
-    return (
-      <Send {...props}>
-        <View>
-          <Ionicons 
-            name="send-outline" 
-            size={22} 
-            color="black"
-            style={{marginRight: 10, marginBottom: 10}} />
-        </View>
-      </Send>
-    );
-  };
+  useEffect(() => {
+    const fetchEventData = async () => {
+      const eventRef = doc(db, 'events', chatName);
+      try {
+        const eventSnap = await getDoc(eventRef);
+        if (eventSnap.exists()) {
+          const data = eventSnap.data();
+          if (data && "attCode" in data) {
+            setAttCode(data.attCode);
+            setAttActive(true);
+          }
+        } else {
+          // Handle the case where the event document does not exist
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error getting document:", error);
+      }
+    };
 
-  const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: colors.lightPink,
-          },
-        }}
-        textStyle={{
-          right: {
-            color: 'black',
-          },
-        }}
-      />
-    );
+    const unsubscribeUser = onSnapshot(doc(db, 'users', authentication.currentUser.uid), (doc) => {
+        if (doc.exists()) {
+          setCurrentUser({ id: doc.id, ...doc.data() }); // Assuming setCurrentUser is your state setter for the user data
+        } else {
+          // Handle the case where the user document does not exist
+          console.log("No such document!");
+        }
+      });
 
-  };
+    fetchEventData();
 
+    return () => {
+        unsubscribeUser();
+    }
 
+    
+  }, []);
 
 
   return (
     <View style={styles.container}>
+
+
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={handleCloseModal}
+        >
+            <TouchableWithoutFeedback onPress={handleCloseModal}>
+            <View style={styles.modalOverlay}>
+                <TouchableWithoutFeedback>
+                <View style={styles.modalView}>
+                    <TextInput
+                    placeholder="Type here..."
+                    style={styles.modalText}
+                    onChangeText={text => setUserCode(text)}
+                    value={userCode}
+                    />
+                    <TouchableOpacity onPress={handleSubmit}>
+                        <View style={styles.submit}>
+                            <Text style={{color: 'white', fontFamily: 'Rubik', fontSize: 18}}>Submit</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+                </TouchableWithoutFeedback>
+            </View>                
+            </TouchableWithoutFeedback>
+
+        </Modal>
+
+        {/* header */}
       <View style={styles.header}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'space-between', width: '100%'}}>
-          <TouchableOpacity onPress={() => navigation.navigate('HomeAdm')}>
+          <TouchableOpacity onPress={() => navigation.navigate('HomeVol')}>
             <MaterialIcons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
           <Text style={styles.title}>{chatName}</Text>
 
         </View>
-      
-          <TouchableOpacity>
-          <View style={styles.cert}>
-            <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Download E-Certificate</Text>
+
+        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: "90%"}}>
+            {attActive
+            ?
+            <TouchableOpacity onPress={handleAttendance}>
+            <View style={styles.cert}>
+                <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Attendance</Text>
+                <AntDesign name="checksquareo" size={24} color="black" />
+            </View>
+            </TouchableOpacity>
+            : 
+            <TouchableOpacity onPress={() => Alert.alert("Attendance code has not been set")}>
+            <View style={[styles.cert, {backgroundColor: colors.activeGrey}]}>
+                <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Attendance</Text>
+                <AntDesign name="checksquareo" size={24} color="black" />
+            </View>
+            </TouchableOpacity>
+            }
+
+            {certActive
+            ? <TouchableOpacity onPress={handleDownload}>
+            <View style={styles.cert}>
+                <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Download E-Certificate</Text>
+                <AntDesign name="download" size={24} color="black" />
+            </View>
+            </TouchableOpacity>
+            :
+            <TouchableOpacity onPress={() => Alert.alert("Attendance not verified", "You can only access your e-certificate once your attendance is verified!")}>
+            <View style={[styles.cert, {backgroundColor: colors.activeGrey}]}>
+                <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Download E-Certificate</Text>
+                <AntDesign name="download" size={24} color="black" />
+            </View>
+            </TouchableOpacity>}
             
-            <AntDesign name="download" size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        
-      </View>
-      <View style={styles.chat}>
-      <GiftedChat
-      messages={messages}
-      onSend={text => onSend(text)}
-      showAvatarForEveryMessage={true}
-      showUserAvatar={true}
-      user={{
-        _id: currentUser,
-        name: name
-      }}
-      renderUsernameOnMessage={true}
-      renderSend={renderSend}
-      renderBubble={renderBubble}
-      alwaysShowSend
-      scrollToBottom
-      scrollToBottomComponent={scrollToBottomComponent}
-      renderInputToolbar={(props) => (
-        <InputToolbar
-          {...props}
-          containerStyle={{
-            backgroundColor: colors.activeGrey,
-            borderTopColor: colors.lightGrey,
-            borderRadius: 10,
-          }}
-          primaryStyle={{ alignItems: 'center' }}
-        />
-      )}
-      renderComposer={(props) => (
-        <Composer
-          {...props}
-          placeholder="Type a message..."
-          textInputStyle={{
-            fontFamily: 'Rubik',
-            color: 'black', // This will set the font color
-            // Add other styles here
-          }}
-          placeholderTextColor="black" // This will set the placeholder text color
-        />
-      )}
-      />
+        </View> 
       </View>
 
-    </View>
-    
+      {/* body */}
+     <Chatroom route={route} />
+
+
+    </View> 
   )
 }
 
@@ -239,15 +236,14 @@ const styles = StyleSheet.create({
 
   },
   cert: {
-    backgroundColor: colors.activeGrey,
+    backgroundColor: 'white',
     flexDirection: 'row',
-    width: 225,
+    width: 150,
     justifyContent: 'space-evenly',
     height: 40,
     alignItems: 'center',
-    borderRadius: 20,
-    borderColor: 'black',
-    borderWidth: 0.3
+    borderRadius: 10,
+    borderColor: 'black'
   },
   button:{
       marginTop:10,
@@ -304,5 +300,53 @@ const styles = StyleSheet.create({
     marginLeft: 0,
     marginRight: 0,
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: colors.activeGrey,
+    borderRadius: 20,
+    padding: 20,
+    width: 200,
+    height: 125,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: 'center',
+    
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    fontFamily: 'Rubik',
+    fontSize: 18,
+    color: 'black'
+  },
+  submit: {
+    backgroundColor: colors.mediumPink,
+    width: 80,
+    height: 30,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: -10
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim the background
+  },
+  
 })
 
