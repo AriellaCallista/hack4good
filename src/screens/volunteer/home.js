@@ -14,7 +14,7 @@ import Chats from './chats'
 
 export default function HomeVolunteer({navigation}) {
   const [name, setName] = useState(null)
-  const [profileUrl, setProfileUrl] = useState(null)
+  const [profileUrl, setProfileUrl] = useState()
   const [activeTab, setActiveTab] = useState('opportunities')
 
   const handleTabPress = (tabName) => {
@@ -26,7 +26,8 @@ export default function HomeVolunteer({navigation}) {
         getDoc(doc(db, "users", authentication.currentUser.uid))
             .then((doc) => {
                 setName(doc.get('name'))
-                setProfileUrl(doc.get('profileUrl'))
+                setProfileUrl(doc.get('photoURL'))
+                console.log(profileUrl)
             })    
      }, [])
   )  
@@ -36,7 +37,10 @@ export default function HomeVolunteer({navigation}) {
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
             <View style={styles.profileBG}>
-              <FontAwesome6 name="user-large" size={55} color="white" />
+              { profileUrl !== ""
+              ? <Image source={{uri: profileUrl}} style={[styles.profileBG, {marginLeft: 0, marginTop: 0}]} />
+              : <FontAwesome6 name="user-large" size={55} color="white" /> 
+              }
             </View>
           </TouchableOpacity>
 

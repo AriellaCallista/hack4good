@@ -5,6 +5,9 @@ import { db, authentication } from '../../../config'
 import { getDoc, doc, setDoc } from "firebase/firestore";
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { Picker } from '@react-native-picker/picker';
+import { FontAwesome6 } from '@expo/vector-icons';
+import { saveMediaToStorage } from '../../api/firestore';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function EditProfile({navigation}) {   
     const [name, setName] = useState('')
@@ -13,6 +16,9 @@ export default function EditProfile({navigation}) {
     const [skills, setSkills] = useState([])
     const [interests, setInterests] = useState([])
     const [workStatus, setWorkStatus] = useState('')
+    const [profPic, setProfPic] = useState('')
+
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -27,6 +33,8 @@ export default function EditProfile({navigation}) {
               setSkills(userData.skills || []); // If userData.skills is undefined, set it to an empty array
               setInterests(userData.interests || []); // If userData.interests is undefined, set it to an empty array
               setWorkStatus(userData.workStatus);
+              if ('profPic' in userData)
+              setProfPic(userData.profPic)
             }
           } catch (error) {
             console.error("Error fetching user profile:", error);
@@ -81,6 +89,7 @@ export default function EditProfile({navigation}) {
             skills,
             interests,
             workStatus,
+            photoURL: profPic
           });
           alert('Profile updated successfully!');
           navigation.navigate("HomeVol")
@@ -90,10 +99,42 @@ export default function EditProfile({navigation}) {
         }
       };
 
+
+  const chooseImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1
+    })
+
+    // console.log(result);
+    console.log(result.assets[0].uri);
+
+    if (!result.canceled) {
+      // save photo to storage and generate downloadURL to be saved in firestore
+     saveMediaToStorage(result.assets[0].uri, `profileImage/${authentication.currentUser.uid}`)
+      .then((downloadUrl) => {
+        setProfPic(downloadUrl)
+      })
+    }
+  }
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.header}>
-                <Image source={require('../../assets/icons/heart.png')} style={styles.logo} />
+              <TouchableOpacity onPress={chooseImage}>
+                <View style={styles.profileBG}>
+                  {profPic === ""
+                  ? <FontAwesome6 name="user-large" size={55} color="white" />
+                  :
+                  <Image source={{uri: profPic }} style={styles.profileBG} />
+                  }
+                </View>
+               
+              </TouchableOpacity>
+              
+                
                 <Text style={{fontFamily: "Lilita", color: "white", fontSize: 30, marginTop: -30}}>WELCOME TO HEARTLINE</Text>
                 <Text style={{fontFamily: "Rubik", color: "white", fontSize: 20, marginTop: 10, marginBottom: 3}}>Personalize your profile below!</Text>
             </View>
@@ -165,14 +206,15 @@ const styles = StyleSheet.create({
         borderRadius: 15, // Adjust to match the border radius in your design
         padding: 20, // Adjust the padding as needed
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center ',
         shadowColor: '#000', // Shadow color can be adjusted
         shadowOffset: {
           width: 0,
           height: 2, // The y-axis offset of the shadow
         },
         width: '100%',
-        marginBottom: 30
+        marginBottom: 30,
+
 
     },
     label: {
@@ -237,5 +279,16 @@ const styles = StyleSheet.create({
       marginTop: -30,
       width: 250,
       height: 250
-  }
+  },
+  profileBG: {
+    backgroundColor: colors.lightPink,
+    width: 85,
+    height: 85,
+    borderRadius: 25,
+    marginTop: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 50
+    
+  },
 })
