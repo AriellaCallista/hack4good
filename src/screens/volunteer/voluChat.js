@@ -11,9 +11,10 @@ import { colors } from '../../utils/colors';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import Chatroom from './chatroom';
+import { useNavigation } from '@react-navigation/native';
 
 
-export default function VoluChat({route, navigation}) {
+export default function VoluChat({route}) {
   const chatName = route.params.name
   const [modalVisible, setModalVisible] = useState(false);
   const [attCode, setAttCode] = useState('');
@@ -30,6 +31,8 @@ export default function VoluChat({route, navigation}) {
     username: ''
   })
 
+  const navigation = useNavigation()
+  
   const handleAttendance = () => {
     setModalVisible(true);
   };

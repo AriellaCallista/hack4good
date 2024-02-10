@@ -12,6 +12,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import Posts from './posts'
 import Chats from './chats'
+import { saveUserProfileImage } from '../../api/firestore'
 
 
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,6 +22,7 @@ export default function HomeAdmin({navigation}) {
   const Tab = createBottomTabNavigator();
   const [name, setName] = useState(null)
   const [profileUrl, setProfileUrl] = useState(null)
+  const [lastPhotoUpdatedAt, setLastPhotoUpdatedAt] = useState(null)
 
   const [activeTab, setActiveTab] = useState('posts')
 
@@ -51,11 +53,11 @@ export default function HomeAdmin({navigation}) {
         getDoc(doc(db, "users", authentication.currentUser.uid))
             .then((doc) => {
                 setName(doc.get('name'))
-                setProfileUrl(doc.get('profileUrl'))
+                setProfileUrl(doc.get('photoURL'))
                 //console.log(photoURL)
                 //console.log(Date.now())
             })    
-     }, [])
+     }, [lastPhotoUpdatedAt])
   )
 
   return (
@@ -64,7 +66,7 @@ export default function HomeAdmin({navigation}) {
           <TouchableOpacity onPress={chooseImage}>
             <View style={styles.profileBG}>
               { profileUrl 
-              ? <Image source={{uri: profileUrl}} style={styles.profileBG} />
+              ? <Image source={{uri: profileUrl}} style={[styles.profileBG, {marginLeft: 0, marginTop: 0}]} />
               : <FontAwesome6 name="user-large" size={55} color="white" /> 
               }
             </View>
@@ -86,7 +88,7 @@ export default function HomeAdmin({navigation}) {
           <TouchableOpacity onPress={() => handleTabPress('posts')}>
             { activeTab === 'posts'
             ? <View style={[styles.button, {backgroundColor: colors.activeGrey}]}>
-                <Text style={styles.buttonText}>Posts.,,</Text>
+                <Text style={styles.buttonText}>Posts</Text>
               </View>
             : <View style={[styles.button, {backgroundColor: colors.lightGrey}]}>
                 <Text style={styles.buttonText}>Posts</Text>

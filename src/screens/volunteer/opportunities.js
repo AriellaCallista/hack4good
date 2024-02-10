@@ -66,7 +66,7 @@ export default function Opportunites() {
           <ScrollView style={styles.posts}>
             {events.map((event) => (
               <View key={event.id} style={styles.eventItem}>
-                <Image source={require('../../assets/placeholder-img.png')} style={styles.postsImg}/>
+                <Image source={{uri: event.eventPic}} style={styles.postsImg}/>
                 <Text style={styles.postsTitle}>{event.newEvent}</Text>
                 <Text style={styles.postsCaption}>{event.newEventDesc}</Text>
                 <View style={styles.dateButtonContainer}>
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
       width: '1000vw'
     },
     postsImg: {
-      width: '100vw',
+      height: 200,
       borderRadius: 20
     },
     postsTitle: {

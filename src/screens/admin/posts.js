@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Linking } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Linking, Alert} from 'react-native'
 import React, { useState, useEffect, useCallback } from 'react'
 import { colors } from '../../utils/colors'
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -8,35 +8,44 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { doc, getDoc, setDoc, onSnapshot, collection } from "firebase/firestore";
 import { db, authentication } from '../../../config'
 import * as ImagePicker from 'expo-image-picker';
+import { saveMediaToStorage } from '../../api/firestore';
 
 export default function Posts() {
   // For firestore document
-  const [newEvent, setNewEvent] = useState(null)
+  const [newEvent, setNewEvent] = useState("")
   const [newEventDesc, setNewEventDesc] = useState(null)
   const [eventDate, setEventDate] = useState("")
   const [appFormLink, setAppFormLink] = useState("")
+  const [eventPic, setEventPic] = useState("")
 
   // For date picker
   const [date, setDate] = useState(new Date())
   const [showPicker, setShowPicker] = useState(false)
 
   const chooseImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1
-    })
-
-    // console.log(result);
-    console.log(result.assets[0].uri);
-
-    if (!result.canceled) {
-      // save photo to storage and generate downloadURL to be saved in firestore
-     saveUserProfileImage(result.assets[0].uri)
-      .then((date) => setLastPhotoUpdatedAt(date))
+    if (newEvent === "") {
+      Alert.alert("Key in event name first")
+    } else {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1
+      })
+  
+      // console.log(result);
+      console.log(result.assets[0].uri);
+  
+      if (!result.canceled) {
+          // save photo to storage and generate downloadURL to be saved in firestore
+        saveMediaToStorage(result.assets[0].uri, `eventImage/${newEvent}`)
+        .then((downloadUrl) => {
+          setEventPic(downloadUrl)
+        }) 
+      }
     }
   }
+
 
 
   const toggleDatePicker = () => {
@@ -58,16 +67,9 @@ export default function Posts() {
   const createEntry = async () => {
     try {
         // Error alerts
-        if (!newEvent || !newEventDesc || !eventDate || !appFormLink) {
+        if (!newEvent || !newEventDesc || !eventDate) {
             alert('Please fill in all required fields!');
             return;
-        }
-
-        // Check if app form link is valid
-        const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
-        if (!urlRegex.test(appFormLink)) {
-          alert("Please add a valid link.");
-          return;
         }
 
         // Add document to Firestore
@@ -75,7 +77,8 @@ export default function Posts() {
             newEvent,
             newEventDesc,
             eventDate,
-            appFormLink
+            appFormLink,
+            eventPic
         });
 
         // Clear fields
@@ -98,6 +101,7 @@ export default function Posts() {
     const unsubscribe = onSnapshot(collection(db, 'events'), (snapshot) => {
       const eventsData = [];
       snapshot.forEach((doc) => {
+        console.log(doc.data().eventPic)
         eventsData.push({ id: doc.id, ...doc.data() });
       });
       setEvents(eventsData);
@@ -167,7 +171,7 @@ export default function Posts() {
             <ScrollView style={styles.posts}>
               {events.map((event) => (
                 <View key={event.id} style={styles.eventItem}>
-                  <Image source={require('../../assets/placeholder-img.png')} style={styles.postsImg}/>
+                  <Image source={{uri: event.eventPic}} style={styles.postsImg}/>
                   <Text style={styles.postsTitle}>{event.newEvent}</Text>
                   <Text style={styles.postsCaption}>{event.newEventDesc}</Text>
                   <View style={styles.dateButtonContainer}>
@@ -316,7 +320,7 @@ const styles = StyleSheet.create({
       width: '1000'
     },
     postsImg: {
-      width: '100',
+      height: 200,
       borderRadius: 20
     },
     postsTitle: {

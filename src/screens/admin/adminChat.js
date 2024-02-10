@@ -15,8 +15,9 @@ import { EvilIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { saveAttCode } from '../../api/firestore';
 import EventStats from './eventStats';
+import { useNavigation } from '@react-navigation/native';
 
-export default function AdminChat({route, navigation}) {
+export default function AdminChat({route}) {
   const uid = route.params.uid
   const chatName = route.params.name
   const [messages, setMessages] = useState([]);
@@ -24,7 +25,9 @@ export default function AdminChat({route, navigation}) {
   const [name, setName] = useState(null)
   const [modalVisible, setModalVisible] = useState(false);
   const [attCode, setAttCode] = useState('');
-  const [attActive, setAttActive] = useState(false)
+  const [attActive, setAttActive] = useState(true)
+  
+  const navigation = useNavigation()
 
   const handleAttendance = () => {
     Alert.alert(
@@ -87,6 +90,7 @@ export default function AdminChat({route, navigation}) {
           if (data && "attCode" in data) {
             setAttCode(data.attCode);
             setAttActive(false);
+            console.log(attActive)
           }
         } else {
           // Handle the case where the event document does not exist
@@ -127,7 +131,7 @@ export default function AdminChat({route, navigation}) {
         unsubcribe()
       }
 
-  },[])
+  },[attCode])
 
   const onSend = useCallback((messagesArray) => {
     const msg = messagesArray[0];

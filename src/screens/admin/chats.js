@@ -23,7 +23,7 @@ export default function Chats({navigation}) {
         key={event => event.date + event.newEvent}
         renderItem={({item}) => 
             <ListItem 
-            onPress={() => navigation.navigate('AdminChat', {name: item.newEvent, uid: item.newEvent, navigation: navigation})}
+            onPress={() => navigation.navigate('AdminChat', {name: item.newEvent, uid: item.newEvent})}
             title={item.newEvent}
             />
         }
