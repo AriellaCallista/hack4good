@@ -58,10 +58,6 @@ export default function AdminChat({route, navigation}) {
     handleCloseModal();
   };
 
-  const handleStatistics = () => {
-
-  }
-
 
   useFocusEffect(
     useCallback(() => {
