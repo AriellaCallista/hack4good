@@ -2,6 +2,9 @@
 
 ## HACK4GOOD 2024
 
+## Deployment (apk file)
+https://drive.google.com/file/d/1sqiQBmtDgyCpNNQCddwKXyympbN9x811/view?usp=sharing 
+
 ### Contents
 
 - Motivation
