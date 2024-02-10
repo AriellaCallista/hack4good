@@ -15,7 +15,6 @@ export default function Opportunites() {
   const [events, setEvents] = useState([]);
   const [currentUser, setCurrentUser] = useState({
     name: '',
-    age: '',
     gender: '',
     workStatus: '',
     interests: [],
@@ -52,10 +51,10 @@ export default function Opportunites() {
 
 
   const handleJoin = async (event) => {
-    if (currentUser.gender === undefined || currentUser.age === undefined || currentUser.workStatus === undefined || currentUser.interests === undefined || currentUser.skills === undefined) {
+    if (currentUser.gender === undefined ||  currentUser.workStatus === undefined || currentUser.interests === undefined || currentUser.skills === undefined) {
         Alert.alert("Incomplete Profile", "Please make sure all your profile fields are filled out.");
     } else {
-        saveVolunteerData(event.newEvent, currentUser.name, currentUser.gender, currentUser.age, currentUser.workStatus, currentUser.interests, currentUser.skills, currentUser.username)
+        saveVolunteerData(event.newEvent, currentUser.name, currentUser.gender, currentUser.workStatus, currentUser.interests, currentUser.skills, currentUser.username)
         saveEventData(event)
         Alert.alert("You're In!", "Head over to your chats to dive into the group conversation and meet others attending.");
     }

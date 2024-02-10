@@ -40,14 +40,11 @@ export default function HomeVolunteer({navigation}) {
             </View>
           </TouchableOpacity>
 
-          <View style={{marginHorizontal: 40}}>
+          <View style={{marginLeft: -30}}>
             <Text style={{fontFamily: "Lilita", color: "white", fontSize: 30}}>Welcome User,</Text>
             <Text style={{fontFamily: "Rubik", color: "white", fontSize: 23, marginTop: 3, marginBottom: 3}}>{name}</Text>
           </View>
 
-          <View style={{marginRight: 20, marginBottom: 10}}>
-            <MaterialCommunityIcons name="qrcode-scan" size={60} color="white" />
-          </View>
         </View>
 
         <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', marginTop: -20}}>
@@ -149,7 +146,7 @@ const styles = StyleSheet.create({
       marginTop: 10,
       justifyContent: 'center',
       alignItems: 'center',
-      marginLeft: 20
+      marginLeft: -35
 
     },
     subtitle: {

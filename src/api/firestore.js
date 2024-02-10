@@ -78,11 +78,10 @@ export const getCurrentUserName =  () => new Promise(async(resolve) =>  {
   } 
 })
 
-export const saveVolunteerData = (eventName, name, gender, age, workStatus, interests, skills, username) => {
+export const saveVolunteerData = (eventName, name, gender, workStatus, interests, skills, username) => {
   setDoc(doc(db, "events", eventName, "volunteers", authentication.currentUser.uid), {
     name: name,
     gender: gender,
-    age: age,
     workStatus: workStatus,
     interests: interests, 
     skills: skills,

@@ -249,7 +249,7 @@ export default function AdminChat({route, navigation}) {
           }
             
 
-            <TouchableOpacity onPress={() => navigation.navigate('EventStats', { eventId: chatName })}>
+            <TouchableOpacity onPress={() => navigation.navigate('EventStats', { eventId: chatName, navigation: navigation })}>
             <View style={styles.cert}>
                 <Text style={{fontFamily: 'Rubik', fontSize: 15 }}>Statistics</Text>
                 <Feather name="bar-chart" size={24} color="black" />

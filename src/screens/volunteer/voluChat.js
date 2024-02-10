@@ -43,7 +43,6 @@ export default function VoluChat({route, navigation}) {
         setDoc(doc(db, "events", chatName, "attendees", authentication.currentUser.uid), {
             name: currentUser.name,
             gender: currentUser.gender,
-            age: currentUser.age,
             workStatus: currentUser.workStatus,
             interests: currentUser.interests, 
             skills: currentUser.skills,
